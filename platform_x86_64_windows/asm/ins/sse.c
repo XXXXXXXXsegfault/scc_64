@@ -1,0 +1,31 @@
+void ins_init_sse(void)
+{
+	ins_add("movups %X1,%X2",0,"\x0f\x10",2,0,0,RR|I_MODRM,0);
+	ins_add("movups ADDR,%X2",0,"\x0f\x10",2,0,0,RM,0);
+	ins_add("movups %X2,ADDR",0,"\x0f\x11",2,0,0,RM,0);
+	ins_add("movq %Q1,%X2","\x66","\x0f\x6e",2,0x48,0,RR|I_MODRM,0);
+	ins_add("movq %X2,%Q1","\x66","\x0f\x7e",2,0x48,0,RR|I_MODRM,0);
+	ins_add("addsd %X1,%X2","\xf2","\x0f\x58",2,0,0,RR|I_MODRM,0);
+	ins_add("addsd ADDR,%X2","\xf2","\x0f\x58",2,0,0,RM,0);
+	ins_add("subsd %X1,%X2","\xf2","\x0f\x5c",2,0,0,RR|I_MODRM,0);
+	ins_add("subsd ADDR,%X2","\xf2","\x0f\x5c",2,0,0,RM,0);
+	ins_add("mulsd %X1,%X2","\xf2","\x0f\x59",2,0,0,RR|I_MODRM,0);
+	ins_add("mulsd ADDR,%X2","\xf2","\x0f\x59",2,0,0,RM,0);
+	ins_add("divsd %X1,%X2","\xf2","\x0f\x5e",2,0,0,RR|I_MODRM,0);
+	ins_add("divsd ADDR,%X2","\xf2","\x0f\x5e",2,0,0,RM,0);
+	ins_add("comisd %X1,%X2","\x66","\x0f\x2f",2,0,0,RR|I_MODRM,0);
+	ins_add("movsd %X2,ADDR","\xf2","\x0f\x11",2,0,0,RM,0);
+	ins_add("movsd ADDR,%X2","\xf2","\x0f\x10",2,0,0,RM,0);
+	ins_add("movsd %X1,%X2","\xf2","\x0f\x10",2,0,0,RR|I_MODRM,0);
+	ins_add("cmpsd $I,%X1,%X2","\xf2","\x0f\xc2",2,0,0,RR|I_MODRM|I_IMM|I_IMMB,0);
+	ins_add("addpd %X1,%X2","\x66","\x0f\x58",2,0,0,RR|I_MODRM,0);
+	ins_add("subpd %X1,%X2","\x66","\x0f\x5c",2,0,0,RR|I_MODRM,0);
+	ins_add("mulpd %X1,%X2","\x66","\x0f\x59",2,0,0,RR|I_MODRM,0);
+	ins_add("divpd %X1,%X2","\x66","\x0f\x5e",2,0,0,RR|I_MODRM,0);
+	ins_add("maxpd ADDR,%X2","\x66","\x0f\x5f",2,0,0,RM,0);
+	ins_add("minpd ADDR,%X2","\x66","\x0f\x5d",2,0,0,RM,0);
+	ins_add("maxsd %X1,%X2","\xf2","\x0f\x5f",2,0,0,RR|I_MODRM,0);
+	ins_add("minsd %X1,%X2","\xf2","\x0f\x5d",2,0,0,RR|I_MODRM,0);
+	ins_add("maxpd %X1,%X2","\x66","\x0f\x5f",2,0,0,RR|I_MODRM,0);
+	ins_add("minpd %X1,%X2","\x66","\x0f\x5d",2,0,0,RR|I_MODRM,0);
+}
