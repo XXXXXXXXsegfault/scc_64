@@ -1,0 +1,8 @@
+Building
+
+SCC can run on x86_64_linux, arm64_linux, x86_64_windows.
+
+To build SCC, run ./build <build_platform> <host_platform> <target_platform>.
+The executables will be in the release_<compiler-type> directory.
+
+
