@@ -67,6 +67,7 @@ void load_file(void)
 		node->str=str;
 		node->line=current_line;
 		node->next=0;
+		node->ins_buf2=0;
 		if(lines_head)
 		{
 			lines_end->next=node;

@@ -133,7 +133,14 @@ void mkelf(void)
 	l=lines_head;
 	while(l)
 	{
-		c_write(l->ins_buf,l->ins_len);
+		if(l->ins_len>48)
+		{
+			c_write(l->ins_buf2,l->ins_len);
+		}
+		else
+		{
+			c_write(l->ins_buf,l->ins_len);
+		}
 		if(fde>=0)
 		{
 			out_addr(l->ins_pos);
