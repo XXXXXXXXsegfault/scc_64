@@ -370,7 +370,17 @@ void add_decl(struct syntax_tree *type,struct syntax_tree *decl,int nodefine,int
 	}
 	if(global||no_change_name)
 	{
-		name=xstrdup(get_decl_id(decl));
+		char *ns;
+		if(global&&(ns=get_namespace()))
+		{
+			name=xstrdup(ns);
+			name=str_s_app(name,"__");
+			name=str_s_app(name,get_decl_id(decl));
+		}
+		else
+		{
+			name=xstrdup(get_decl_id(decl));
+		}
 	}
 	else
 	{
@@ -543,6 +553,7 @@ void translate_fundef(struct syntax_tree *root)
 	}
 	decl_check(type,decl);
 	add_decl(type,decl,0,0,0,0);
+	++t_env.func_num;
 	c_write("arglist\n",8);
 	x=1;
 	translate_stack_push();

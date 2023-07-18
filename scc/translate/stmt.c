@@ -120,6 +120,30 @@ void translate_break(struct syntax_tree *root)
 	free(name);
 
 }
+void translate_goto(struct syntax_tree *root)
+{
+	char *name;
+	c_write("bal ",4);
+	name=xstrdup("_$CL$");
+	name=str_i_app(name,t_env.func_num);
+	name=str_s_app(name,"$");
+	name=str_s_app(name,root->subtrees[0]->value);
+	c_write(name,strlen(name));
+	c_write("\n",1);
+	free(name);
+}
+void translate_label(struct syntax_tree *root)
+{
+	char *name;
+	c_write("label ",6);
+	name=xstrdup("_$CL$");
+	name=str_i_app(name,t_env.func_num);
+	name=str_s_app(name,"$");
+	name=str_s_app(name,root->subtrees[0]->value);
+	c_write(name,strlen(name));
+	c_write("\n",1);
+	free(name);
+}
 void translate_ifelse(struct syntax_tree *root)
 {
 	struct branch_args args;
@@ -197,6 +221,14 @@ void translate_stmt(struct syntax_tree *node)
 	else if(!strcmp(node->name,"break"))
 	{
 		translate_break(node);
+	}
+	else if(!strcmp(node->name,"goto"))
+	{
+		translate_goto(node);
+	}
+	else if(!strcmp(node->name,"Label"))
+	{
+		translate_label(node);
 	}
 
 }

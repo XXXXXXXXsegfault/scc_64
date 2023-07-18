@@ -36,12 +36,6 @@ int _open(char *str,int flags,int mode)
 	}
 	file_tab[x].fp=fp;
 	file_tab[x].type=type;
-#ifdef __linux__
-	if(type==1)
-	{
-		chmod(str,0755);
-	}
-#endif
 	return x+3;
 }
 int _close(int fd)
@@ -65,18 +59,7 @@ int _read(int fd,void *buf,int size)
 	void *fp;
 	if(fd<3)
 	{
-#ifdef __GNUC__
-		if(fd==0)
-		{
-			fp=stdin;
-		}
-		else
-		{
-			return -1;
-		}
-#else
 		return -1;
-#endif
 	}
 	else
 	{
@@ -104,23 +87,8 @@ int _write(int fd,void *buf,int size)
 	void *fp;
 	if(fd<3)
 	{
-#ifdef __GNUC__
-		if(fd==1)
-		{
-			fp=stdout;
-		}
-		else if(fd==2)
-		{
-			fp=stderr;
-		}
-		else
-		{
-			return -1;
-		}
-#else
 		MessageBoxA(0,buf,"Error",0);
 		return size;
-#endif
 	}
 	else
 	{

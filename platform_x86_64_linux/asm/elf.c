@@ -30,11 +30,25 @@ unsigned long int spos;
 void swrite(void *buf,unsigned long int size)
 {
 	unsigned char *new_data;
-	new_data=xmalloc(l->ins_len+size);
-	memcpy(new_data,l->ins_buf,l->ins_len);
-	memcpy(new_data+l->ins_len,buf,size);
-	free(l->ins_buf);
-	l->ins_buf=new_data;
+	if(l->ins_len+size>48)
+	{
+		new_data=xmalloc(l->ins_len+size);
+		if(l->ins_len<=48)
+		{
+			memcpy(new_data,l->ins_buf,l->ins_len);
+		}
+		else
+		{
+			memcpy(new_data,l->ins_buf2,l->ins_len);
+		}
+		memcpy(new_data+l->ins_len,buf,size);
+		free(l->ins_buf2);
+		l->ins_buf2=new_data;
+	}
+	else
+	{
+		memcpy(l->ins_buf+l->ins_len,buf,size);
+	}
 	l->ins_len+=size;
 	spos+=size;
 	pc+=size;

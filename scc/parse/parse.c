@@ -36,6 +36,23 @@ void st_add_subtree(struct syntax_tree *st,struct syntax_tree *subtree)
 	free(st->subtrees);
 	st->subtrees=subtrees;
 }
+void syntax_tree_release(struct syntax_tree *root)
+{
+	int x;
+	x=0;
+	if(root==0)
+	{
+		return;
+	}
+	while(x<root->count_subtrees)
+	{
+		syntax_tree_release(root->subtrees[x]);
+		++x;
+	}
+	free(root->value);
+	free(root->subtrees);
+	free(root);
+}
 struct l_word_list *p_current_word;
 long int p_current_line;
 long int p_current_col;
@@ -125,6 +142,10 @@ struct syntax_tree *parse_file(void)
 		{
 			st_add_subtree(ret,node);
 		}
+		else if(node=parse_namespace())
+		{
+			st_add_subtree(ret,node);
+		}
 		else if(node=parse_asm())
 		{
 			st_add_subtree(ret,node);
@@ -148,28 +169,24 @@ void parse_global_init(void)
 	p_current_line=1;
 	p_current_col=1;
 	keyw_list[0]="break";
-	keyw_list[1]="case";
-	keyw_list[2]="char";
-	keyw_list[3]="continue";
-	keyw_list[4]="default";
-	keyw_list[5]="do";
-	keyw_list[6]="else";
-	keyw_list[7]="extern";
-	keyw_list[8]="float";
-	keyw_list[9]="goto";
-	keyw_list[10]="if";
-	keyw_list[11]="int";
-	keyw_list[12]="long";
-	keyw_list[13]="return";
-	keyw_list[14]="short";
-	keyw_list[15]="signed";
-	keyw_list[16]="sizeof";
-	keyw_list[17]="static";
-	keyw_list[18]="switch";
-	keyw_list[19]="typedef";
-	keyw_list[20]="union";
-	keyw_list[21]="unsigned";
-	keyw_list[22]="void";
-	keyw_list[23]="while";
-	keyw_list[24]="asm";
+	keyw_list[1]="char";
+	keyw_list[2]="do";
+	keyw_list[3]="else";
+	keyw_list[4]="extern";
+	keyw_list[5]="float";
+	keyw_list[6]="goto";
+	keyw_list[7]="if";
+	keyw_list[8]="int";
+	keyw_list[9]="long";
+	keyw_list[10]="return";
+	keyw_list[11]="short";
+	keyw_list[12]="signed";
+	keyw_list[13]="sizeof";
+	keyw_list[14]="static";
+	keyw_list[15]="union";
+	keyw_list[16]="unsigned";
+	keyw_list[17]="void";
+	keyw_list[18]="while";
+	keyw_list[19]="asm";
+	keyw_list[20]="namespace";
 }

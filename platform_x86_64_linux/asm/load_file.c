@@ -49,7 +49,8 @@ struct lines
 	unsigned long int prev_ins_pos;
 	int needs_recompile;
 	int ins_len;
-	char *ins_buf;
+	char ins_buf[48];
+	char *ins_buf2;
 	unsigned long int ins_off;
 	unsigned long int optimize;
 	struct lines *next;

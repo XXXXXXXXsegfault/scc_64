@@ -96,6 +96,10 @@ char *read_str(char c)
 			s=str_c_app2(s,x,c1);
 			++x;
 		}
+		else if(c1=='\n'||c1=='\r')
+		{
+			error(line,col,"string not complete.");
+		}
 		++x;
 	}
 	if(c1==-1)

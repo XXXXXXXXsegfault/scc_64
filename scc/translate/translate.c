@@ -24,23 +24,6 @@ struct syntax_tree *syntax_tree_dup(struct syntax_tree *root)
 	}
 	return node;
 }
-void syntax_tree_release(struct syntax_tree *root)
-{
-	int x;
-	x=0;
-	if(root==0)
-	{
-		return;
-	}
-	while(x<root->count_subtrees)
-	{
-		syntax_tree_release(root->subtrees[x]);
-		++x;
-	}
-	free(root->value);
-	free(root->subtrees);
-	free(root);
-}
 struct id_tab
 {
 	char *name;
@@ -68,6 +51,15 @@ struct control_labels
 	long int l3;
 	struct control_labels *next;
 };
+char *current_namespace;
+char *get_namespace(void)
+{
+	if(current_namespace==0||!strcmp(current_namespace,"<NULL>"))
+	{
+		return 0;
+	}
+	return current_namespace;
+}
 struct translate_env
 {
 	long int next_num;
@@ -78,6 +70,7 @@ struct translate_env
 	struct translate_stack *stack;
 	int write;
 	int label_in_use;
+	long int func_num;
 	struct control_labels *label;
 	struct control_labels *break_label;
 } t_env;
@@ -157,6 +150,8 @@ struct id_tab *id_find(char *name)
 	char *name1;
 	struct translate_stack *node;
 	struct id_tab *ret;
+	char *new_name;
+	char *ns;
 	node=t_env.stack;
 	while(node)
 	{
@@ -177,6 +172,19 @@ struct id_tab *id_find(char *name)
 		free(name1);
 		node=node->next;
 	}
+	ns=get_namespace();
+	if(ns)
+	{
+		new_name=xstrdup(ns);
+		new_name=str_s_app(new_name,"__");
+		new_name=str_s_app(new_name,name);
+		ret=id_tab_find(t_env.global_id,new_name);
+		free(new_name);
+		if(ret)
+		{
+			return ret;
+		}
+	}
 	return id_tab_find(t_env.global_id,name);
 }
 struct id_tab *id_find2(char *name)
@@ -184,6 +192,8 @@ struct id_tab *id_find2(char *name)
 	char *name1;
 	struct translate_stack *node;
 	struct id_tab *ret;
+	char *new_name;
+	char *ns;
 	node=t_env.stack;
 	if(node)
 	{
@@ -203,6 +213,19 @@ struct id_tab *id_find2(char *name)
 		}
 		free(name1);
 		return 0;
+	}
+	ns=get_namespace();
+	if(ns)
+	{
+		new_name=xstrdup(ns);
+		new_name=str_s_app(new_name,"__");
+		new_name=str_s_app(new_name,name);
+		ret=id_tab_find(t_env.global_id,new_name);
+		free(new_name);
+		if(ret)
+		{
+			return ret;
+		}
 	}
 	return id_tab_find(t_env.global_id,name);
 }
@@ -316,6 +339,10 @@ void translate_file(struct syntax_tree *root)
 		else if(!strcmp(root->subtrees[x]->name,"fundef"))
 		{
 			translate_fundef(root->subtrees[x]);
+		}
+		else if(!strcmp(root->subtrees[x]->name,"namespace"))
+		{
+			current_namespace=root->subtrees[x]->subtrees[0]->value;
 		}
 		else if(!strcmp(root->subtrees[x]->name,"asm"))
 		{
