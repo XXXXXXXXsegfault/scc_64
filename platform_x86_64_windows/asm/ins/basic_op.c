@@ -417,4 +417,6 @@ void ins_init_basic_op(void)
 	ins_add("xor %B2,ADDR",0,"\x30",1,0,0,RM,0);
 	ins_add("xor ADDR,%B2",0,"\x32",1,0,0,RM,0);
 
+	ins_add("btc $I,%L1",0,"\x0f\xba",2,0,0x38,I8R|I_MODRM,0);
+	ins_add("btc $I,%Q1",0,"\x0f\xba",2,0x48,0x38,I8R|I_MODRM,0);
 }

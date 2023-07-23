@@ -170,7 +170,7 @@ void __malloc_error(void)
 	write(2,"invalid pointer or corruption detected.\n",40);
 	while(1)
 	{
-		asm ".long 0xffffffff"
+		ARCH_BAD_INST
 	}
 }
 void __malloc_zone_add(struct __malloc_zone *node)

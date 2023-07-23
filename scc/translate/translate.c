@@ -73,6 +73,7 @@ struct translate_env
 	long int func_num;
 	struct control_labels *label;
 	struct control_labels *break_label;
+	long int func_type;
 } t_env;
 struct expr_ret
 {
@@ -80,6 +81,7 @@ struct expr_ret
 	int is_lval;
 	short int is_const;
 	short int needs_deref;
+	long ptr_offset;
 	struct syntax_tree *type;
 	struct syntax_tree *decl;
 };
@@ -322,6 +324,13 @@ void c_write(char *buf,int size)
 		++buf;
 		--size;
 	}
+}
+void c_write_num(unsigned long num)
+{
+	char *buf;
+	buf=str_i_app(0,num);
+	c_write(buf,strlen(buf));
+	free(buf);
 }
 #include "decl.c"
 #include "expr.c"

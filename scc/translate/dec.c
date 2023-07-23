@@ -49,29 +49,74 @@ void calculate_dec(struct syntax_tree *root,struct expr_ret *ret)
 			decl2->subtrees[0]->value=new_name;
 		}
 		add_decl(new_type,new_decl,0,0,0,1);
-		if(is_float_type(result.type)&&is_basic_decl(decl1))
+		if(result.ptr_offset)
 		{
-			c_write("ldf ",4);
+			if(is_float_type(result.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(result.type->name,"float"))
+				{
+					c_write("ldof ",5);
+				}
+				else
+				{
+					c_write("ldoh ",5);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("ldob ",5);
+			}
+			else if(size==2)
+			{
+				c_write("ldow ",5);
+			}
+			else if(size==4)
+			{
+				c_write("ldol ",5);
+			}
+			else if(size==8)
+			{
+				c_write("ldoq ",5);
+			}
 		}
-		else if(size==1)
+		else
 		{
-			c_write("ldb ",4);
-		}
-		else if(size==2)
-		{
-			c_write("ldw ",4);
-		}
-		else if(size==4)
-		{
-			c_write("ldl ",4);
-		}
-		else if(size==8)
-		{
-			c_write("ldq ",4);
+			if(is_float_type(result.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(result.type->name,"float"))
+				{
+					c_write("ldf ",4);
+				}
+				else
+				{
+					c_write("ldh ",4);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("ldb ",4);
+			}
+			else if(size==2)
+			{
+				c_write("ldw ",4);
+			}
+			else if(size==4)
+			{
+				c_write("ldl ",4);
+			}
+			else if(size==8)
+			{
+				c_write("ldq ",4);
+			}
 		}
 		c_write(new_name,strlen(new_name));
 		c_write(" ",1);
 		c_write(old_name,strlen(old_name));
+		if(result.ptr_offset)
+		{
+			c_write(" ",1);
+			c_write_num(result.ptr_offset);
+		}
 		c_write("\n",1);
 
 		c_write("sub ",4);
@@ -84,29 +129,75 @@ void calculate_dec(struct syntax_tree *root,struct expr_ret *ret)
 		c_write(str,strlen(str));
 		c_write("\n",1);
 		free(str);
-		if(is_float_type(result.type)&&is_basic_decl(decl1))
+		if(result.ptr_offset)
 		{
-			c_write("stf ",4);
+			if(is_float_type(result.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(result.type->name,"float"))
+				{
+					c_write("stof ",5);
+				}
+				else
+				{
+					c_write("stoh ",5);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("stob ",5);
+			}
+			else if(size==2)
+			{
+				c_write("stow ",5);
+			}
+			else if(size==4)
+			{
+				c_write("stol ",5);
+			}
+			else if(size==8)
+			{
+				c_write("stoq ",5);
+			}
 		}
-		else if(size==1)
+		else
 		{
-			c_write("stb ",4);
+			if(is_float_type(result.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(result.type->name,"float"))
+				{
+					c_write("stf ",4);
+				}
+				else
+				{
+					c_write("sth ",4);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("stb ",4);
+			}
+			else if(size==2)
+			{
+				c_write("stw ",4);
+			}
+			else if(size==4)
+			{
+				c_write("stl ",4);
+			}
+			else if(size==8)
+			{
+				c_write("stq ",4);
+			}
 		}
-		else if(size==2)
-		{
-			c_write("stw ",4);
-		}
-		else if(size==4)
-		{
-			c_write("stl ",4);
-		}
-		else if(size==8)
-		{
-			c_write("stq ",4);
-		}
+
 		c_write(old_name,strlen(old_name));
 		c_write(" ",1);
 		c_write(new_name,strlen(new_name));
+		if(result.ptr_offset)
+		{
+			c_write(" ",1);
+			c_write_num(result.ptr_offset);
+		}
 		c_write("\n",1);
 
 		free(old_name);

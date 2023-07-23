@@ -21,14 +21,16 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	{
 		fins=ins;
 	}
+	/*
 	if(class2==1)
 	{
-		reg_ext(op2->tab->reg+4,op2->tab->class,9);
+		reg_ext(op2->tab->reg+4,op2->tab->class,10);
 	}
 	if(class3==1)
 	{
-		reg_ext(op3->tab->reg+4,op3->tab->class,9);
+		reg_ext(op3->tab->reg+4,op3->tab->class,10);
 	}
+	*/
 	if(class2==1)
 	{
 		outs("mov x1,");
@@ -42,7 +44,7 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	else if(class2==2)
 	{
 		outs("mov64 x1,");
-		op_out_const(9,op2);
+		op_out_const(10,op2);
 		outs("\n");
 	}
 	else if(class2==3)
@@ -62,24 +64,34 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	else if(class3==2)
 	{
 		outs("mov64 x2,");
-		op_out_const(9,op3);
+		op_out_const(10,op3);
 		outs("\n");
 	}
 	else if(class3==3)
 	{
 		op_calculate_addr(op3,2);
 	}
-	if(class2==2||class2==3||op2->tab->class==9)
+	if(class2==2||class2==3||op2->tab->class==10)
 	{
 		outs("fmov d1,x1\n");
+	}
+	else if(op2->tab->class==9)
+	{
+		outs("fmov s1,w1\n");
+		outs("fcvt d1,s1\n");
 	}
 	else
 	{
 		outs("scvtf d1,x1\n");
 	}
-	if(class2==2||class3==3||op3->tab->class==9)
+	if(class3==2||class3==3||op3->tab->class==10)
 	{
 		outs("fmov d2,x2\n");
+	}
+	else if(op3->tab->class==9)
+	{
+		outs("fmov s2,w2\n");
+		outs("fcvt d2,s2\n");
 	}
 	else
 	{
@@ -87,14 +99,120 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	}
 	outs(fins);
 	outs(" d0,d1,d2\n");
-	if(op1->tab->class==9)
+	outs("fmov x0,d0\n");
+	if(class1==1)
 	{
-		outs("fmov x0,d0\n");
+		outs("mov ");
+		out_reg64(op1->tab->reg+4);
+		outs(",x0\n");
 	}
 	else
 	{
-		outs("fcvtns x0,d0\n");
+		op_mem_ldst("str",op1,0);
 	}
+}
+void gen_hfloat_basic_op(int class1,int class2,int class3,struct operand *op1,struct operand *op2,struct operand *op3,char *ins)
+{
+	char *fins;
+	if(!strcmp(ins,"add"))
+	{
+		fins="fadd";
+	}
+	else if(!strcmp(ins,"sub"))
+	{
+		fins="fsub";
+	}
+	else if(!strcmp(ins,"mul"))
+	{
+		fins="fmul";
+	}
+	else if(!strcmp(ins,"udiv"))
+	{
+		fins="fdiv";
+	}
+	else
+	{
+		fins=ins;
+	}
+	/*
+	if(class2==1)
+	{
+		reg_ext(op2->tab->reg+4,op2->tab->class,9);
+	}
+	if(class3==1)
+	{
+		reg_ext(op3->tab->reg+4,op3->tab->class,9);
+	}
+	*/
+	if(class2==1)
+	{
+		outs("mov x1,");
+		out_reg64(op2->tab->reg+4);
+		outs("\n");
+	}
+	else if(class2==0)
+	{
+		op_mem_ldst("ldr",op2,1);
+	}
+	else if(class2==2)
+	{
+		outs("mov64 x1,");
+		op_out_const(10,op2);
+		outs("\n");
+	}
+	else if(class2==3)
+	{
+		op_calculate_addr(op2,1);
+	}
+	if(class3==1)
+	{
+		outs("mov x2,");
+		out_reg64(op3->tab->reg+4);
+		outs("\n");
+	}
+	else if(class3==0)
+	{
+		op_mem_ldst("ldr",op3,2);
+	}
+	else if(class3==2)
+	{
+		outs("mov64 x2,");
+		op_out_const(10,op3);
+		outs("\n");
+	}
+	else if(class3==3)
+	{
+		op_calculate_addr(op3,2);
+	}
+	if(class2==2||class2==3||op2->tab->class==10)
+	{
+		outs("fmov d1,x1\n");
+		outs("fcvt s1,d1\n");
+	}
+	else if(op2->tab->class==9)
+	{
+		outs("fmov s1,w1\n");
+	}
+	else
+	{
+		outs("scvtf s1,x1\n");
+	}
+	if(class3==2||class3==3||op3->tab->class==10)
+	{
+		outs("fmov d2,x2\n");
+		outs("fcvt s2,d2\n");
+	}
+	else if(op3->tab->class==9)
+	{
+		outs("fmov s2,w2\n");
+	}
+	else
+	{
+		outs("scvtf s2,x2\n");
+	}
+	outs(fins);
+	outs(" s0,s1,s2\n");
+	outs("fmov w0,s0\n");
 	if(class1==1)
 	{
 		outs("mov ");
@@ -157,6 +275,11 @@ void gen_basic_op(struct ins *ins,char *op)
 		error(ins->line,"invalid op.");
 	}
 	if(op1.tab->class==9)
+	{
+		gen_hfloat_basic_op(class1,class2,class3,&op1,&op2,&op3,op);
+		return;
+	}
+	if(op1.tab->class==10)
 	{
 		gen_float_basic_op(class1,class2,class3,&op1,&op2,&op3,op);
 		return;

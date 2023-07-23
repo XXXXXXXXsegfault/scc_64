@@ -423,6 +423,138 @@ int parse_reg64(char **str)
 	}
 	return -1;
 }
+int parse_hreg(char **str)
+{
+	if(str_match2(str,"s10",3))
+	{
+		return 10;
+	}
+	if(str_match2(str,"s11",3))
+	{
+		return 11;
+	}
+	if(str_match2(str,"s12",3))
+	{
+		return 12;
+	}
+	if(str_match2(str,"s13",3))
+	{
+		return 13;
+	}
+	if(str_match2(str,"s14",3))
+	{
+		return 14;
+	}
+	if(str_match2(str,"s15",3))
+	{
+		return 15;
+	}
+	if(str_match2(str,"s16",3))
+	{
+		return 16;
+	}
+	if(str_match2(str,"s17",3))
+	{
+		return 17;
+	}
+	if(str_match2(str,"s18",3))
+	{
+		return 18;
+	}
+	if(str_match2(str,"s19",3))
+	{
+		return 19;
+	}
+	if(str_match2(str,"s20",3))
+	{
+		return 20;
+	}
+	if(str_match2(str,"s21",3))
+	{
+		return 21;
+	}
+	if(str_match2(str,"s22",3))
+	{
+		return 22;
+	}
+	if(str_match2(str,"s23",3))
+	{
+		return 23;
+	}
+	if(str_match2(str,"s24",3))
+	{
+		return 24;
+	}
+	if(str_match2(str,"s25",3))
+	{
+		return 25;
+	}
+	if(str_match2(str,"s26",3))
+	{
+		return 26;
+	}
+	if(str_match2(str,"s27",3))
+	{
+		return 27;
+	}
+	if(str_match2(str,"s28",3))
+	{
+		return 28;
+	}
+	if(str_match2(str,"s29",3))
+	{
+		return 29;
+	}
+	if(str_match2(str,"s30",3))
+	{
+		return 30;
+	}
+	if(str_match2(str,"s31",3))
+	{
+		return 31;
+	}
+	if(str_match2(str,"s0",2))
+	{
+		return 0;
+	}
+	if(str_match2(str,"s1",2))
+	{
+		return 1;
+	}
+	if(str_match2(str,"s2",2))
+	{
+		return 2;
+	}
+	if(str_match2(str,"s3",2))
+	{
+		return 3;
+	}
+	if(str_match2(str,"s4",2))
+	{
+		return 4;
+	}
+	if(str_match2(str,"s5",2))
+	{
+		return 5;
+	}
+	if(str_match2(str,"s6",2))
+	{
+		return 6;
+	}
+	if(str_match2(str,"s7",2))
+	{
+		return 7;
+	}
+	if(str_match2(str,"s8",2))
+	{
+		return 8;
+	}
+	if(str_match2(str,"s9",2))
+	{
+		return 9;
+	}
+	return -1;
+}
 int parse_freg(char **str)
 {
 	if(str_match2(str,"d10",3))
@@ -660,6 +792,38 @@ int get_ins_args(char *input,char *format,struct ins_args *args)
 		else if(!strcmp(word,"F4"))
 		{
 			if((args->reg4=parse_freg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"H1"))
+		{
+			if((args->reg1=parse_hreg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"H2"))
+		{
+			if((args->reg2=parse_hreg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"H3"))
+		{
+			if((args->reg3=parse_hreg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"H4"))
+		{
+			if((args->reg4=parse_hreg(&input))==-1)
 			{
 				free(word);
 				return -1;

@@ -6,7 +6,7 @@ void calculate_call(struct syntax_tree *root,struct expr_ret *ret)
 	char *name,*new_name;
 	calculate_expr(root->subtrees[0],&func);
 	deref_ptr(&func,root->line,root->col);
-	if(!is_function(func.decl))
+	if(is_pointer_array(func.decl))
 	{
 		decl=decl_next(func.decl);
 		syntax_tree_release(func.decl);
@@ -31,7 +31,21 @@ void calculate_call(struct syntax_tree *root,struct expr_ret *ret)
 		{
 			error(root->line,root->col,"incompatible type.");
 		}
-		c_write("push ",5);
+		if(is_float_type(decl1->subtrees[x*2-1])&&!is_pointer_array_function(decl1->subtrees[x*2]))
+		{
+			if(!strcmp(decl1->subtrees[x*2-1]->name,"float"))
+			{
+				c_write("pushf ",6);
+			}
+			else
+			{
+				c_write("pushh ",6);
+			}
+		}
+		else
+		{
+			c_write("push ",5);
+		}
 		if(result.is_const)
 		{
 			name=str_i_app(0,result.value);
@@ -62,7 +76,14 @@ void calculate_call(struct syntax_tree *root,struct expr_ret *ret)
 	add_decl(type,decl,0,0,0,1);
 	if(is_basic_decl(decl)&&is_float_type(type))
 	{
-		c_write("fcall ",6);
+		if(!strcmp(type->name,"float"))
+		{
+			c_write("fcall ",6);
+		}
+		else
+		{
+			c_write("hcall ",6);
+		}
 	}
 	else
 	{

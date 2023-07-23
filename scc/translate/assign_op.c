@@ -20,12 +20,26 @@ void calculate_assign_op(struct syntax_tree *root,struct expr_ret *ret,char *op,
 		msg=str_s_app(msg,"\'.");
 		error(root->line,root->col,msg);
 	}
+	if(is_float_type(right.type)&&strcmp(op,"*=")&&strcmp(op,"/="))
+	{
+		msg=xstrdup("invalid operand for \'");
+		msg=str_s_app(msg,op);
+		msg=str_s_app(msg,"\'.");
+		error(root->line,root->col,msg);
+	}
 	if(left.needs_deref)
 	{
 		new_name=mktmpname();
 		decl1=decl_next(left.decl);
 		if(is_basic_type(left.type)&&is_basic_decl(decl1))
 		{
+			if(is_float_type(left.type)&&strcmp(op,"*=")&&strcmp(op,"/="))
+			{
+				msg=xstrdup("invalid operand for \'");
+				msg=str_s_app(msg,op);
+				msg=str_s_app(msg,"\'.");
+				error(root->line,root->col,msg);
+			}
 			size=type_size(left.type,decl1);
 		}
 		else
@@ -52,29 +66,74 @@ void calculate_assign_op(struct syntax_tree *root,struct expr_ret *ret,char *op,
 		}
 		add_decl(new_type,new_decl,0,0,0,1);
 
-		if(is_float_type(left.type)&&is_basic_decl(decl1))
+		if(left.ptr_offset)
 		{
-			c_write("ldf ",4);
+			if(is_float_type(left.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(left.type->name,"float"))
+				{
+					c_write("ldof ",5);
+				}
+				else
+				{
+					c_write("ldoh ",5);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("ldob ",5);
+			}
+			else if(size==2)
+			{
+				c_write("ldow ",5);
+			}
+			else if(size==4)
+			{
+				c_write("ldol ",5);
+			}
+			else if(size==8)
+			{
+				c_write("ldoq ",5);
+			}
 		}
-		else if(size==1)
+		else
 		{
-			c_write("ldb ",4);
-		}
-		else if(size==2)
-		{
-			c_write("ldw ",4);
-		}
-		else if(size==4)
-		{
-			c_write("ldl ",4);
-		}
-		else if(size==8)
-		{
-			c_write("ldq ",4);
+			if(is_float_type(left.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(left.type->name,"float"))
+				{
+					c_write("ldf ",4);
+				}
+				else
+				{
+					c_write("ldh ",4);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("ldb ",4);
+			}
+			else if(size==2)
+			{
+				c_write("ldw ",4);
+			}
+			else if(size==4)
+			{
+				c_write("ldl ",4);
+			}
+			else if(size==8)
+			{
+				c_write("ldq ",4);
+			}
 		}
 		c_write(new_name,strlen(new_name));
 		c_write(" ",1);
 		c_write(old_name,strlen(old_name));
+		if(left.ptr_offset)
+		{
+			c_write(" ",1);
+			c_write_num(left.ptr_offset);
+		}
 		c_write("\n",1);
 
 		if(right.is_const)
@@ -97,30 +156,75 @@ void calculate_assign_op(struct syntax_tree *root,struct expr_ret *ret,char *op,
 		c_write("\n",1);
 		free(str);
 
-		if(is_float_type(left.type)&&is_basic_decl(decl1))
+		if(left.ptr_offset)
 		{
-			c_write("stf ",4);
+			if(is_float_type(left.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(left.type->name,"float"))
+				{
+					c_write("stof ",5);
+				}
+				else
+				{
+					c_write("stoh ",5);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("stob ",5);
+			}
+			else if(size==2)
+			{
+				c_write("stow ",5);
+			}
+			else if(size==4)
+			{
+				c_write("stol ",5);
+			}
+			else if(size==8)
+			{
+				c_write("stoq ",5);
+			}
 		}
-		else if(size==1)
+		else
 		{
-			c_write("stb ",4);
-		}
-		else if(size==2)
-		{
-			c_write("stw ",4);
-		}
-		else if(size==4)
-		{
-			c_write("stl ",4);
-		}
-		else if(size==8)
-		{
-			c_write("stq ",4);
+			if(is_float_type(left.type)&&is_basic_decl(decl1))
+			{
+				if(!strcmp(left.type->name,"float"))
+				{
+					c_write("stf ",4);
+				}
+				else
+				{
+					c_write("sth ",4);
+				}
+			}
+			else if(size==1)
+			{
+				c_write("stb ",4);
+			}
+			else if(size==2)
+			{
+				c_write("stw ",4);
+			}
+			else if(size==4)
+			{
+				c_write("stl ",4);
+			}
+			else if(size==8)
+			{
+				c_write("stq ",4);
+			}
 		}
 
 		c_write(old_name,strlen(old_name));
 		c_write(" ",1);
 		c_write(new_name,strlen(new_name));
+		if(left.ptr_offset)
+		{
+			c_write(" ",1);
+			c_write_num(left.ptr_offset);
+		}
 		c_write("\n",1);
 		syntax_tree_release(decl1);
 

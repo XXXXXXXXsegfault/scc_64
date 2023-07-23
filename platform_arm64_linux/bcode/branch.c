@@ -220,20 +220,20 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 			c=8;
 		}
 	}
-	if(c==9)
+	if(c==9||c==10)
 	{
 		sign=0;
 	}
-	if(class1==1)
+	if(class1==1&&c!=9&&c!=10)
 	{
 		reg_ext(op1.tab->reg+4,op1.tab->class,c);
 	}
-	if(class2==1)
+	if(class2==1&&c!=9&&c!=10)
 	{
 		reg_ext(op2.tab->reg+4,op2.tab->class,c);
 	}
 	s=0;
-	if(class1==1&&c!=9)
+	if(class1==1&&c!=9&&c!=10)
 	{
 		if(class2==1)
 		{
@@ -274,7 +274,7 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 			s=1;
 		}
 	}
-	if(class1==0&&c!=9)
+	if(class1==0&&c!=9&&c!=10)
 	{
 		if(class2==1)
 		{
@@ -354,17 +354,57 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 		}
 		if(c==9)
 		{
-			if(class1==2||class1==3||op1.tab->class==9)
+			if(class1==2||class1==3||op1.tab->class==10)
 			{
 				outs("fmov d1,x1\n");
+				outs("fcvt s1,d1\n");
+			}
+			else if(op1.tab->class==9)
+			{
+				outs("fmov s1,w1\n");
+			}
+			else
+			{
+				outs("scvtf s1,x1\n");
+			}
+			if(class2==2||class2==3||op2.tab->class==10)
+			{
+				outs("fmov d2,x2\n");
+				outs("fcvt s2,d2\n");
+			}
+			else if(op2.tab->class==9)
+			{
+				outs("fmov s2,w2\n");
+			}
+			else
+			{
+				outs("scvtf s2,x2\n");
+			}
+			outs("fcmp s1,s2\n");
+		}
+		else if(c==10)
+		{
+			if(class1==2||class1==3||op1.tab->class==10)
+			{
+				outs("fmov d1,x1\n");
+			}
+			else if(op1.tab->class==9)
+			{
+				outs("fmov s1,w1\n");
+				outs("fcvt d1,s1\n");
 			}
 			else
 			{
 				outs("scvtf d1,x1\n");
 			}
-			if(class2==2||class2==3||op2.tab->class==9)
+			if(class2==2||class2==3||op2.tab->class==10)
 			{
 				outs("fmov d2,x2\n");
+			}
+			else if(op2.tab->class==9)
+			{
+				outs("fmov s2,w2\n");
+				outs("fcvt d2,s2\n");
 			}
 			else
 			{

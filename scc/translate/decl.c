@@ -344,6 +344,24 @@ void add_decl(struct syntax_tree *type,struct syntax_tree *decl,int nodefine,int
 	{
 		global=1;
 		class=1;
+		decl2=decl_next(decl);
+		if(is_pointer(decl2))
+		{
+			t_env.func_type=0;
+		}
+		else if(!strcmp(type->name,"float"))
+		{
+			t_env.func_type=2;
+		}
+		else if(!strcmp(type->name,"hfloat"))
+		{
+			t_env.func_type=1;
+		}
+		else
+		{
+			t_env.func_type=0;
+		}
+		syntax_tree_release(decl2);
 	}
 	else
 	{
@@ -361,7 +379,7 @@ void add_decl(struct syntax_tree *type,struct syntax_tree *decl,int nodefine,int
 		}
 		else if(!strcmp(decl1->name,"array_nosize"))
 		{
-			class=2;
+			error(decl->line,decl->col,"cannot determine array size.");
 		}
 	}
 	if(array_size==-1&&init&&!strcmp(init->name,"init"))
@@ -619,6 +637,10 @@ unsigned long int type_size(struct syntax_tree *type,struct syntax_tree *decl)
 		{
 			return 8;
 		}
+		if(!strcmp(type->name,"hfloat"))
+		{
+			return 4;
+		}
 		if(!strcmp(type->name,"float"))
 		{
 			return 8;
@@ -672,7 +694,7 @@ int is_basic_type(struct syntax_tree *type)
 	{
 		return 1;
 	}
-	if(!strcmp(type->name,"float"))
+	if(!strcmp(type->name,"float")||!strcmp(type->name,"hfloat"))
 	{
 		return 1;
 	}
@@ -690,7 +712,7 @@ int is_basic_decl(struct syntax_tree *decl)
 }
 int is_float_type(struct syntax_tree *type)
 {
-	if(!strcmp(type->name,"float"))
+	if(!strcmp(type->name,"float")||!strcmp(type->name,"hfloat"))
 	{
 		return 1;
 	}
@@ -809,8 +831,14 @@ int if_type_compat(struct syntax_tree *type,struct syntax_tree *decl,struct synt
 	{
 		return 1;
 	}
-	s1=is_float_type(type)&&is_basic_decl(decl);
-	s2=is_float_type(type2)&&is_basic_decl(decl2);
+	s1=is_basic_type(type)&&is_basic_decl(decl)||is_pointer_array_function(decl);
+	s2=is_basic_type(type2)&&is_basic_decl(decl2)||is_pointer_array_function(decl2);
+	if(!s1||!s2)
+	{
+		return 1;
+	}
+	s1=is_float_type(type)&&!is_pointer_array_function(decl);
+	s2=is_float_type(type2)&&!is_pointer_array_function(decl2);
 	if(s1!=s2)
 	{
 		return 1;

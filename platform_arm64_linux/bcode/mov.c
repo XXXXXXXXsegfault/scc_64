@@ -43,25 +43,17 @@ void gen_movc(struct ins *ins)
 			outs(",");
 			outs(ins->cond);
 			outs("\n");
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(op1.tab->reg+4);
-			}
-			else if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(op1.tab->reg+4);
+				reg_ext(op1.tab->reg+4,op2.tab->class,op1.tab->class);
 			}
 		}
 		else if(class2==0)
 		{
 			op_mem_ldst("ldr",&op2,0);
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(0);
-			}
-			else if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(0);
+				reg_ext(0,op2.tab->class,op1.tab->class);
 			}
 			outs("csel ");
 			out_reg64(op1.tab->reg+4);
@@ -114,17 +106,9 @@ void gen_movc(struct ins *ins)
 			outs(",x1,");
 			outs(ins->cond);
 			outs("\n");
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(1);
-				op_mem_ldst("str",&op1,1);
-				return;
-			}
-			if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(1);
-				op_mem_ldst("str",&op1,1);
-				return;
+				reg_ext(1,op2.tab->class,op1.tab->class);
 			}
 			op_mem_ldst("str",&op1,1);
 		}
@@ -134,13 +118,9 @@ void gen_movc(struct ins *ins)
 			if(class2==0)
 			{
 				op_mem_ldst("ldr",&op2,1);
-				if(op2.tab->class==9&&op1.tab->class!=9)
+				if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 				{
-					reg_f2q(1);
-				}
-				else if(op2.tab->class!=9&&op1.tab->class==9)
-				{
-					reg_q2f(1);
+					reg_ext(1,op2.tab->class,op1.tab->class);
 				}
 			}
 			else if(class2==2)
@@ -213,25 +193,17 @@ void gen_movnc(struct ins *ins)
 			outs(",");
 			outs(ins->cond);
 			outs("\n");
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(op1.tab->reg+4);
-			}
-			else if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(op1.tab->reg+4);
+				reg_ext(op1.tab->reg+4,op2.tab->class,op1.tab->class);
 			}
 		}
 		else if(class2==0)
 		{
 			op_mem_ldst("ldr",&op2,0);
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(0);
-			}
-			else if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(0);
+				reg_ext(0,op2.tab->class,op1.tab->class);
 			}
 			outs("csel ");
 			out_reg64(op1.tab->reg+4);
@@ -284,17 +256,9 @@ void gen_movnc(struct ins *ins)
 			outs(",");
 			outs(ins->cond);
 			outs("\n");
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(1);
-				op_mem_ldst("str",&op1,1);
-				return;
-			}
-			if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(1);
-				op_mem_ldst("str",&op1,1);
-				return;
+				reg_ext(1,op2.tab->class,op1.tab->class);
 			}
 			op_mem_ldst("str",&op1,1);
 		}
@@ -304,13 +268,9 @@ void gen_movnc(struct ins *ins)
 			if(class2==0)
 			{
 				op_mem_ldst("ldr",&op2,1);
-				if(op2.tab->class==9&&op1.tab->class!=9)
+				if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 				{
-					reg_f2q(1);
-				}
-				else if(op2.tab->class!=9&&op1.tab->class==9)
-				{
-					reg_q2f(1);
+					reg_ext(1,op2.tab->class,op1.tab->class);
 				}
 			}
 			else if(class2==2)
@@ -393,25 +353,17 @@ void gen_mov(struct ins *ins)
 			outs(",");
 			out_reg64(op2.tab->reg+4);
 			outs("\n");
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(op1.tab->reg+4);
-			}
-			else if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(op1.tab->reg+4);
+				reg_ext(op1.tab->reg+4,op2.tab->class,op1.tab->class);
 			}
 		}
 		else if(class2==0)
 		{
 			op_mem_ldst("ldr",&op2,op1.tab->reg+4);
-			if(op2.tab->class==9&&op1.tab->class!=9)
+			if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 			{
-				reg_f2q(op1.tab->reg+4);
-			}
-			else if(op2.tab->class!=9&&op1.tab->class==9)
-			{
-				reg_q2f(op1.tab->reg+4);
+				reg_ext(op1.tab->reg+4,op2.tab->class,op1.tab->class);
 			}
 		}
 		else if(class2==2)
@@ -436,7 +388,10 @@ void gen_mov(struct ins *ins)
 				outs("mov x1,");
 				out_reg64(op2.tab->reg+4);
 				outs("\n");
-				reg_f2q(1);
+				if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
+				{
+					reg_ext(1,op2.tab->class,op1.tab->class);
+				}
 				op_mem_ldst("str",&op1,1);
 				return;
 			}
@@ -445,7 +400,10 @@ void gen_mov(struct ins *ins)
 				outs("mov x1,");
 				out_reg64(op2.tab->reg+4);
 				outs("\n");
-				reg_q2f(1);
+				if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
+				{
+					reg_ext(1,op2.tab->class,op1.tab->class);
+				}
 				op_mem_ldst("str",&op1,1);
 				return;
 			}
@@ -456,13 +414,9 @@ void gen_mov(struct ins *ins)
 			if(class2==0)
 			{
 				op_mem_ldst("ldr",&op2,1);
-				if(op2.tab->class==9&&op1.tab->class!=9)
+				if((op1.tab->class==9||op2.tab->class==9||op1.tab->class==10||op2.tab->class==10)&&op1.tab->class!=op2.tab->class)
 				{
-					reg_f2q(1);
-				}
-				else if(op2.tab->class!=9&&op1.tab->class==9)
-				{
-					reg_q2f(1);
+					reg_ext(1,op2.tab->class,op1.tab->class);
 				}
 			}
 			else if(class2==2)

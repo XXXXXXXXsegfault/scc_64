@@ -84,7 +84,7 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2,char *op_3,char *op_4)
 			c=8;
 		}
 	}
-	if(c==9)
+	if(c==9||c==10)
 	{
 		sign=0;
 	}
@@ -156,11 +156,18 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2,char *op_3,char *op_4)
 		out_rcx(8);
 		outs("\n");
 	}
-	if(c==9)
+	if(c==10)
 	{
 		outs("movq %rax,%xmm0\n");
 		outs("movq %rcx,%xmm1\n");
 		outs("comisd ");
+		outs("%xmm1,%xmm0\n");
+	}
+	else if(c==9)
+	{
+		outs("movd %eax,%xmm0\n");
+		outs("movd %ecx,%xmm1\n");
+		outs("comiss ");
 		outs("%xmm1,%xmm0\n");
 	}
 	else

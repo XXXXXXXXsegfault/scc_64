@@ -35,7 +35,18 @@ void translate_return(struct syntax_tree *root)
 		{
 			name=xstrdup(get_decl_id(ret.decl));
 		}
-		c_write("retval ",7);
+		if(t_env.func_type==1)
+		{
+			c_write("retvalh ",8);
+		}
+		else if(t_env.func_type==2)
+		{
+			c_write("retvalf ",8);
+		}
+		else
+		{
+			c_write("retval ",7);
+		}
 		c_write(name,strlen(name));
 		expr_ret_release(&ret);
 		free(name);

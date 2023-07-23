@@ -66,9 +66,14 @@ void gen_div(struct ins *ins)
 	{
 		error(ins->line,"invalid op.");
 	}
-	if(op1.tab->class==9)
+	if(op1.tab->class==10)
 	{
 		gen_float_basic_op(class1,class2,class3,&op1,&op2,&op3,"divsd ");
+		return;
+	}
+	if(op1.tab->class==9)
+	{
+		gen_hfloat_basic_op(class1,class2,class3,&op1,&op2,&op3,"divss ");
 		return;
 	}
 	if(class2==1)

@@ -29,6 +29,10 @@ void calculate_assign(struct syntax_tree *root,struct expr_ret *ret,char *op1,ch
 		}
 		t=get_decl_type(decl1);
 		c_write(op2,strlen(op2));
+		if(left.ptr_offset)
+		{
+			c_write("o",1);
+		}
 		if(!strcmp(t->name,"pointer"))
 		{
 			c_write("q ",2);
@@ -46,7 +50,14 @@ void calculate_assign(struct syntax_tree *root,struct expr_ret *ret,char *op1,ch
 			size=type_size(left.type,decl1);
 			if(is_float_type(left.type)&&is_basic_decl(decl1))
 			{
-				c_write("f ",2);
+				if(!strcmp(left.type->name,"float"))
+				{
+					c_write("f ",2);
+				}
+				else
+				{
+					c_write("h ",2);
+				}
 			}
 			else if(size==1)
 			{
@@ -92,6 +103,11 @@ void calculate_assign(struct syntax_tree *root,struct expr_ret *ret,char *op1,ch
 	c_write(name,strlen(name));
 	c_write(" ",1);
 	c_write(str,strlen(str));
+	if(left.needs_deref&&left.ptr_offset)
+	{
+		c_write(" ",1);
+		c_write_num(left.ptr_offset);
+	}
 	c_write("\n",1);
 	free(str);
 	ret->is_lval=0;

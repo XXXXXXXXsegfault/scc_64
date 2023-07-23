@@ -72,7 +72,7 @@ int op_is_addr(struct operand *op)
 }
 int if_class_signed(int class)
 {
-	if(class==9)
+	if(class==9||class==10)
 	{
 		return 0;
 	}
@@ -94,7 +94,7 @@ void op_reg_st(int addr_reg,int reg,int class)
 		outs("strh ");
 		out_reg32(reg);
 	}
-	else if(class==5||class==6)
+	else if(class==5||class==6||class==9)
 	{
 		outs("str ");
 		out_reg32(reg);
@@ -107,7 +107,59 @@ void op_reg_st(int addr_reg,int reg,int class)
 	outs(",[");
 	out_reg64(addr_reg);
 	outs("]\n");
-}	
+}
+void op_reg_st_off(int addr_reg,int reg,int class,struct operand *off)
+{
+	long off_val;
+	int mode;
+	off_val=off->value;
+	mode=0;
+	if(off_val<=-256||off_val>=256)
+	{
+		outs("mov64 x3,");
+		out_num64(off_val);
+		outs("\n");
+		mode=1;
+	}
+	if(class==1||class==2)
+	{
+		outs("strb ");
+		out_reg32(reg);
+	}
+	else if(class==3||class==4)
+	{
+		outs("strh ");
+		out_reg32(reg);
+	}
+	else if(class==5||class==6||class==9)
+	{
+		outs("str ");
+		out_reg32(reg);
+	}
+	else
+	{
+		outs("str ");
+		out_reg64(reg);
+	}
+	outs(",[");
+	out_reg64(addr_reg);
+	outs(",");
+	if(mode)
+	{
+		outs("x3");
+	}
+	else if(off_val>=0)
+	{
+		outs("#");
+		out_num64(off_val);
+	}
+	else
+	{
+		outs("#-");
+		out_num64(-off_val);
+	}
+	outs("]\n");
+}
 void op_reg_ld(int addr_reg,int reg,int class)
 {
 	if(class==1||class==2)
@@ -136,7 +188,7 @@ void op_reg_ld(int addr_reg,int reg,int class)
 			out_reg32(reg);
 		}
 	}
-	else if(class==5||class==6)
+	else if(class==5||class==6||class==9)
 	{
 		if(class==5)
 		{
@@ -158,9 +210,87 @@ void op_reg_ld(int addr_reg,int reg,int class)
 	out_reg64(addr_reg);
 	outs("]\n");
 }	
+void op_reg_ld_off(int addr_reg,int reg,int class,struct operand *off)
+{
+	long off_val;
+	int mode;
+	off_val=off->value;
+	mode=0;
+	if(off_val<=-256||off_val>=256)
+	{
+		outs("mov64 x3,");
+		out_num64(off_val);
+		outs("\n");
+		mode=1;
+	}
+	if(class==1||class==2)
+	{
+		if(class==1)
+		{
+			outs("ldrsb ");
+			out_reg64(reg);
+		}
+		else
+		{
+			outs("ldrb ");
+			out_reg32(reg);
+		}
+	}
+	else if(class==3||class==4)
+	{
+		if(class==3)
+		{
+			outs("ldrsh ");
+			out_reg64(reg);
+		}
+		else
+		{
+			outs("ldrh ");
+			out_reg32(reg);
+		}
+	}
+	else if(class==5||class==6||class==9)
+	{
+		if(class==5)
+		{
+			outs("ldrsw ");
+			out_reg64(reg);
+		}
+		else
+		{
+			outs("ldr ");
+			out_reg32(reg);
+		}
+	}
+	else
+	{
+		outs("ldr ");
+		out_reg64(reg);
+	}
+	outs(",[");
+	out_reg64(addr_reg);
+	outs(",");
+	if(mode)
+	{
+		outs("x3");
+	}
+	else if(off_val>=0)
+	{
+		outs("#");
+		out_num64(off_val);
+	}
+	else
+	{
+		outs("#-");
+		out_num64(-off_val);
+	}
+	outs("]\n");
+}	
 void op_mem_ldst(char *ld_st,struct operand *op,int reg)
 {
 	long int x;
+	int ld;
+	ld=!strcmp(ld_st,"ldr");
 	if(op->tab->storage==0)
 	{
 		if(op->tab->reg>=REGS)
@@ -175,8 +305,13 @@ void op_mem_ldst(char *ld_st,struct operand *op,int reg)
 		if(x<256&&x>-256)
 		{
 			outs(ld_st);
-			out_reg_size(reg,op->tab->class);
+			out_reg_size(reg,op->tab->class,ld);
 			outs(",[x29,#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
 			out_num64(x);
 			outs("]\n");
 		}
@@ -186,7 +321,7 @@ void op_mem_ldst(char *ld_st,struct operand *op,int reg)
 			out_num64(x);
 			outs("\n");
 			outs(ld_st);
-			out_reg_size(reg,op->tab->class);
+			out_reg_size(reg,op->tab->class,ld);
 			outs(",[x29,x3]\n");
 		}
 	}
@@ -196,7 +331,7 @@ void op_mem_ldst(char *ld_st,struct operand *op,int reg)
 		out_num64(op->tab->off);
 		outs("\n");
 		outs(ld_st);
-		out_reg_size(reg,op->tab->class);
+		out_reg_size(reg,op->tab->class,ld);
 		outs(",[x3]\n");
 	}
 	else if(op->tab->storage==1)
@@ -205,35 +340,184 @@ void op_mem_ldst(char *ld_st,struct operand *op,int reg)
 		out_num64(op->tab->off*16+16);
 		outs("\n");
 		outs(ld_st);
-		out_reg_size(reg,op->tab->class);
+		out_reg_size(reg,op->tab->class,ld);
 		outs(",[x29,x3]\n");
 	}
-	if(!strcmp(ld_st,"ldr"))
+}
+void op_mem_ldst_off(char *ld_st,struct operand *op,int reg,struct operand *off)
+{
+	long int x;
+	int ld;
+	ld=!strcmp(ld_st,"ldr");
+	if(op->tab->storage==0)
 	{
-		if(op->tab->class==1)
+		if(op->tab->reg>=REGS)
 		{
-			outs("sxtb ");
-			out_reg64(reg);
-			outs(",");
-			out_reg32(reg);
-			outs("\n");
+			x=op->tab->reg-REGS;
+			x=x*16+fun_stack_size;
 		}
-		else if(op->tab->class==3)
+		else
 		{
-			outs("sxth ");
-			out_reg64(reg);
-			outs(",");
-			out_reg32(reg);
-			outs("\n");
+			x=op->tab->off;
 		}
-		else if(op->tab->class==5)
+		x+=off->value;
+		if(x<256&&x>-256)
 		{
-			outs("sxtw ");
-			out_reg64(reg);
-			outs(",");
-			out_reg32(reg);
-			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,op->tab->class,ld);
+			outs(",[x29,#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
 		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,op->tab->class,ld);
+			outs(",[x29,x3]\n");
+		}
+	}
+	else if(op->tab->storage==2)
+	{
+		outs("mov64 x3,@_$DATA+");
+		out_num64(op->tab->off+off->value);
+		outs("\n");
+		outs(ld_st);
+		out_reg_size(reg,op->tab->class,ld);
+		outs(",[x3]\n");
+	}
+	else if(op->tab->storage==1)
+	{
+		outs("mov64 x3,");
+		out_num64(op->tab->off*16+16+off->value);
+		outs("\n");
+		outs(ld_st);
+		out_reg_size(reg,op->tab->class,ld);
+		outs(",[x29,x3]\n");
+	}
+}
+void op_mem_ldst2(char *ld_st,struct operand *op,int reg,int c)
+{
+	long int x;
+	int ld;
+	ld=!strcmp(ld_st,"ldr");
+	if(op->tab->storage==0)
+	{
+		if(op->tab->reg>=REGS)
+		{
+			x=op->tab->reg-REGS;
+			x=x*16+fun_stack_size;
+		}
+		else
+		{
+			x=op->tab->off;
+		}
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[x29,#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[x29,x3]\n");
+		}
+	}
+	else if(op->tab->storage==2)
+	{
+		outs("mov64 x3,@_$DATA+");
+		out_num64(op->tab->off);
+		outs("\n");
+		outs(ld_st);
+		out_reg_size(reg,c,ld);
+		outs(",[x3]\n");
+	}
+	else if(op->tab->storage==1)
+	{
+		outs("mov64 x3,");
+		out_num64(op->tab->off*16+16);
+		outs("\n");
+		outs(ld_st);
+		out_reg_size(reg,c,ld);
+		outs(",[x29,x3]\n");
+	}
+}
+void op_mem_ldst_off2(char *ld_st,struct operand *op,int reg,struct operand *off,int c)
+{
+	long int x;
+	int ld;
+	ld=!strcmp(ld_st,"ldr");
+	if(op->tab->storage==0)
+	{
+		if(op->tab->reg>=REGS)
+		{
+			x=op->tab->reg-REGS;
+			x=x*16+fun_stack_size;
+		}
+		else
+		{
+			x=op->tab->off;
+		}
+		x+=off->value;
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[x29,#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[x29,x3]\n");
+		}
+	}
+	else if(op->tab->storage==2)
+	{
+		outs("mov64 x3,@_$DATA+");
+		out_num64(op->tab->off+off->value);
+		outs("\n");
+		outs(ld_st);
+		out_reg_size(reg,c,ld);
+		outs(",[x3]\n");
+	}
+	else if(op->tab->storage==1)
+	{
+		outs("mov64 x3,");
+		out_num64(op->tab->off*16+16+off->value);
+		outs("\n");
+		outs(ld_st);
+		out_reg_size(reg,c,ld);
+		outs(",[x29,x3]\n");
 	}
 }
 void op_calculate_addr(struct operand *op,int reg)
@@ -294,6 +578,65 @@ void op_calculate_addr(struct operand *op,int reg)
 		outs(",x29,x3\n");
 	}
 }
+void op_calculate_addr_off(struct operand *op,int reg,struct operand *off)
+{
+	long int x;
+	if(op->tab->storage==0)
+	{
+		if(op->tab->reg>=REGS)
+		{
+			x=op->tab->reg-REGS;
+			x=x*16+fun_stack_size;
+		}
+		else
+		{
+			x=op->tab->off;
+		}
+		x+=off->value;
+		if(x<256&&x>=0)
+		{
+			outs("add ");
+			out_reg64(reg);
+			outs(",x29,#");
+			out_num64(x);
+			outs("\n");
+		}
+		else if(x>-256&&x<0)
+		{
+			outs("sub ");
+			out_reg64(reg);
+			outs(",x29,#");
+			out_num64(-x);
+			outs("\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs("add ");
+			out_reg64(reg);
+			outs(",x29,x3\n");
+		}
+	}
+	else if(op->tab->storage==2)
+	{
+		outs("mov64 ");
+		out_reg64(reg);
+		outs(",@_$DATA+");
+		out_num64(op->tab->off+off->value);
+		outs("\n");
+	}
+	else if(op->tab->storage==1)
+	{
+		outs("mov64 x3,");
+		out_num64(op->tab->off*16+16+off->value);
+		outs("\n");
+		outs("add ");
+		out_reg64(reg);
+		outs(",x29,x3\n");
+	}
+}
 void reg_f2q(int reg)
 {
 	outs("fmov d0,");
@@ -307,6 +650,38 @@ void reg_q2f(int reg)
 	outs("scvtf d0,");
 	out_reg64(reg);
 	outs("\nfmov ");
+	out_reg64(reg);
+	outs(",d0\n");
+}
+void reg_h2q(int reg)
+{
+	outs("fmov s0,");
+	out_reg32(reg);
+	outs("\nfcvtns ");
+	out_reg64(reg);
+	outs(",s0\n");
+}
+void reg_q2h(int reg)
+{
+	outs("scvtf s0,");
+	out_reg64(reg);
+	outs("\nfmov ");
+	out_reg32(reg);
+	outs(",s0\n");
+}
+void reg_f2h(int reg)
+{
+	outs("fmov d0,");
+	out_reg64(reg);
+	outs("\nfcvt s0,d0\nfmov ");
+	out_reg32(reg);
+	outs(",s0\n");
+}
+void reg_h2f(int reg)
+{
+	outs("fmov s0,");
+	out_reg32(reg);
+	outs("\nfcvt d0,s0\nfmov ");
 	out_reg64(reg);
 	outs(",d0\n");
 }
@@ -352,7 +727,7 @@ void reg_ext(int reg,int class,int new_class)
 		out_reg32(reg);
 		outs("\n");
 	}
-	else if(class==6)
+	else if(class==6||class==9)
 	{
 		outs("mov ");
 		out_reg32(reg);
@@ -360,11 +735,33 @@ void reg_ext(int reg,int class,int new_class)
 		out_reg32(reg);
 		outs("\n");
 	}
-	if(class==9&&new_class!=9)
+	if(class==9)
 	{
-		reg_f2q(reg);
+		if(new_class==10)
+		{
+			reg_h2f(reg);
+		}
+		else if(new_class!=9)
+		{
+			reg_h2q(reg);
+		}
 	}
-	if(class!=9&&new_class==9)
+	else if(class==10)
+	{
+		if(new_class==9)
+		{
+			reg_f2h(reg);
+		}
+		else if(new_class!=10)
+		{
+			reg_f2q(reg);
+		}
+	}
+	else if(new_class==9)
+	{
+		reg_q2h(reg);
+	}
+	else if(new_class==10)
 	{
 		reg_q2f(reg);
 	}
@@ -372,20 +769,42 @@ void reg_ext(int reg,int class,int new_class)
 void op_out_const(int class,struct operand *op)
 {
 	unsigned long val;
-	float fval;
+	double fval;
+	float hval;
 	if(op->type==2)
 	{
-		if(class==9)
+		if(class==9||class==10)
 		{
 			if(op->is_float)
 			{
-				out_num64(op->fvalue);
+				if(class==10)
+				{
+					out_num(class,op->fvalue);
+				}
+				else
+				{
+					memcpy(&fval,&op->fvalue,8);
+					hval=fval;
+					val=0;
+					memcpy(&val,&hval,4);
+					out_num(class,val);
+				}
 			}
 			else
 			{
-				fval=(float)op->value;
-				memcpy(&val,&fval,8);
-				out_num64(val);
+				if(class==10)
+				{
+					fval=(double)op->value;
+					memcpy(&val,&fval,8);
+					out_num(class,val);
+				}
+				else
+				{
+					hval=(float)op->value;
+					val=0;
+					memcpy(&val,&hval,4);
+					out_num(class,val);
+				}
 			}
 		}
 		else
@@ -393,11 +812,11 @@ void op_out_const(int class,struct operand *op)
 			if(op->is_float)
 			{
 				val=(long)op->fvalue;
-				out_num64(val);
+				out_num(class,val);
 			}
 			else
 			{
-				out_num64(op->value);
+				out_num(class,op->value);
 			}
 		}
 	}
@@ -612,9 +1031,13 @@ void gen_code(struct ins *ins)
 		{
 			gen_ld(ins,7);
 		}
-		else if(!strcmp(ins->args[0],"ldf"))
+		else if(!strcmp(ins->args[0],"ldh"))
 		{
 			gen_ld(ins,9);
+		}
+		else if(!strcmp(ins->args[0],"ldf"))
+		{
+			gen_ld(ins,10);
 		}
 		else if(!strcmp(ins->args[0],"stb"))
 		{
@@ -632,25 +1055,97 @@ void gen_code(struct ins *ins)
 		{
 			gen_st(ins,7);
 		}
-		else if(!strcmp(ins->args[0],"stf"))
+		else if(!strcmp(ins->args[0],"sth"))
 		{
 			gen_st(ins,9);
 		}
+		else if(!strcmp(ins->args[0],"stf"))
+		{
+			gen_st(ins,10);
+		}
+		else if(!strcmp(ins->args[0],"ldob"))
+		{
+			gen_ldo(ins,1);
+		}
+		else if(!strcmp(ins->args[0],"ldow"))
+		{
+			gen_ldo(ins,3);
+		}
+		else if(!strcmp(ins->args[0],"ldol"))
+		{
+			gen_ldo(ins,5);
+		}
+		else if(!strcmp(ins->args[0],"ldoq"))
+		{
+			gen_ldo(ins,7);
+		}
+		else if(!strcmp(ins->args[0],"ldoh"))
+		{
+			gen_ldo(ins,9);
+		}
+		else if(!strcmp(ins->args[0],"ldof"))
+		{
+			gen_ldo(ins,10);
+		}
+		else if(!strcmp(ins->args[0],"stob"))
+		{
+			gen_sto(ins,1);
+		}
+		else if(!strcmp(ins->args[0],"stow"))
+		{
+			gen_sto(ins,3);
+		}
+		else if(!strcmp(ins->args[0],"stol"))
+		{
+			gen_sto(ins,5);
+		}
+		else if(!strcmp(ins->args[0],"stoq"))
+		{
+			gen_sto(ins,7);
+		}
+		else if(!strcmp(ins->args[0],"stoh"))
+		{
+			gen_sto(ins,9);
+		}
+		else if(!strcmp(ins->args[0],"stof"))
+		{
+			gen_sto(ins,10);
+		}
 		else if(!strcmp(ins->args[0],"push"))
 		{
-			gen_push(ins);
+			gen_push(ins,8);
+		}
+		else if(!strcmp(ins->args[0],"pushh"))
+		{
+			gen_push(ins,9);
+		}
+		else if(!strcmp(ins->args[0],"pushf"))
+		{
+			gen_push(ins,10);
 		}
 		else if(!strcmp(ins->args[0],"call"))
 		{
 			gen_call(ins,0);
 		}
-		else if(!strcmp(ins->args[0],"fcall"))
+		else if(!strcmp(ins->args[0],"hcall"))
 		{
 			gen_call(ins,1);
 		}
+		else if(!strcmp(ins->args[0],"fcall"))
+		{
+			gen_call(ins,2);
+		}
 		else if(!strcmp(ins->args[0],"retval"))
 		{
-			gen_retval(ins);
+			gen_retval(ins,8);
+		}
+		else if(!strcmp(ins->args[0],"retvalh"))
+		{
+			gen_retval(ins,9);
+		}
+		else if(!strcmp(ins->args[0],"retvalf"))
+		{
+			gen_retval(ins,10);
 		}
 		else if(!strcmp(ins->args[0],"not"))
 		{
@@ -663,6 +1158,10 @@ void gen_code(struct ins *ins)
 		else if(!strcmp(ins->args[0],"adr"))
 		{
 			gen_adr(ins);
+		}
+		else if(!strcmp(ins->args[0],"adro"))
+		{
+			gen_adro(ins);
 		}
 		else if(!strcmp(ins->args[0],"del"))
 		{

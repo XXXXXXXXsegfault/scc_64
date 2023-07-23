@@ -234,15 +234,11 @@ void out_reg(int class,int reg)
 	{
 		out_reg16(reg);
 	}
-	else if(class==5||class==6)
+	else if(class==5||class==6||class==9)
 	{
 		out_reg32(reg);
 	}
-	else if(class==7||class==8)
-	{
-		out_reg64(reg);
-	}
-	else if(class==9)
+	else if(class==7||class==8||class==10)
 	{
 		out_reg64(reg);
 	}
@@ -303,17 +299,19 @@ void out_num(int class,unsigned long int n)
 	{
 		out_num64(n);
 	}
-	else if(class==9)
+	else if(class==10)
 	{
 		out_num64(n);
+	}
+	else if(class==9)
+	{
+		float n2;
+		n2=*(double *)&n;
+		out_num32(*(unsigned int *)&n2);
 	}
 }
 void out_rax(int class)
 {
-	if(class==9)
-	{
-		class=8;
-	}
 	if(class==1||class==2)
 	{
 		outs("%al");
@@ -322,21 +320,17 @@ void out_rax(int class)
 	{
 		outs("%ax");
 	}
-	else if(class==5||class==6)
+	else if(class==5||class==6||class==9)
 	{
 		outs("%eax");
 	}
-	else if(class==7||class==8)
+	else if(class==7||class==8||class==10)
 	{
 		outs("%rax");
 	}
 }
 void out_rcx(int class)
 {
-	if(class==9)
-	{
-		class=8;
-	}
 	if(class==1||class==2)
 	{
 		outs("%cl");
@@ -345,21 +339,17 @@ void out_rcx(int class)
 	{
 		outs("%cx");
 	}
-	else if(class==5||class==6)
+	else if(class==5||class==6||class==9)
 	{
 		outs("%ecx");
 	}
-	else if(class==7||class==8)
+	else if(class==7||class==8||class==10)
 	{
 		outs("%rcx");
 	}
 }
 void out_rdx(int class)
 {
-	if(class==9)
-	{
-		class=8;
-	}
 	if(class==1||class==2)
 	{
 		outs("%dl");
@@ -368,11 +358,11 @@ void out_rdx(int class)
 	{
 		outs("%dx");
 	}
-	else if(class==5||class==6)
+	else if(class==5||class==6||class==9)
 	{
 		outs("%edx");
 	}
-	else if(class==7||class==8)
+	else if(class==7||class==8||class==10)
 	{
 		outs("%rdx");
 	}
@@ -395,24 +385,68 @@ void out_acd(int class,int reg)
 void acd_extend(int reg,int newclass,int oldclass)
 {
 	int size1,size2;
-	if(newclass==9)
+	if(newclass==9||newclass==10)
 	{
-		if(oldclass!=9)
+		if(oldclass!=9&&oldclass!=10)
 		{
-			acd_extend(reg,7,oldclass);
-			outs("push ");
-			out_acd(8,reg);
-			outs("\nfildq (%rsp)\nfstpl (%rsp)\npop ");
-			out_acd(8,reg);
+			if(oldclass<5)
+			{
+				acd_extend(reg,5,oldclass);
+				oldclass=5;
+			}
+			if(newclass==10)
+			{
+				outs("cvtsi2sd ");
+			}
+			else
+			{
+				outs("cvtsi2ss ");
+			}
+			out_acd(oldclass,reg);
+			outs(",%xmm0");
+			if(newclass==9)
+			{
+				outs("movd %xmm0,");
+			}
+			else
+			{
+				outs("movq %xmm0,");
+			}
+			out_acd(newclass,reg);
+			outs("\n");
+		}
+		else if(newclass==9&&oldclass==10)
+		{
+			outs("movq ");
+			out_acd(oldclass,reg);
+			outs(",%xmm0\ncvtsd2ss %xmm0,%xmm0\nmovd %xmm0,");
+			out_acd(newclass,reg);
+			outs("\n");
+		}
+		else if(newclass==10&&oldclass==9)
+		{
+			outs("movd ");
+			out_acd(oldclass,reg);
+			outs(",%xmm0\ncvtss2sd %xmm0,%xmm0\nmovq %xmm0,");
+			out_acd(newclass,reg);
 			outs("\n");
 		}
 		return;
 	}
 	else if(oldclass==9)
 	{
-		outs("push ");
+		outs("movd ");
+		out_acd(9,reg);
+		outs(",%xmm0\ncvtss2si %xmm0,");
 		out_acd(8,reg);
-		outs("\nfldl (%rsp)\nfistpq (%rsp)\npop ");
+		outs("\n");
+		return;
+	}
+	else if(oldclass==10)
+	{
+		outs("movq ");
+		out_acd(10,reg);
+		outs(",%xmm0\ncvtsd2si %xmm0,");
 		out_acd(8,reg);
 		outs("\n");
 		return;

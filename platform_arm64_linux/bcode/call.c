@@ -1,4 +1,4 @@
-void gen_push(struct ins *ins)
+void gen_push(struct ins *ins,int c)
 {
 	struct operand op1;
 	int class1;
@@ -18,10 +18,20 @@ void gen_push(struct ins *ins)
 	}
 	if(class1==1)
 	{
-		outs("str ");
-		out_reg64(op1.tab->reg+4);
-		outs(",[sp,#-16]!\n");
-		return;
+		if(c<=8&&op1.tab->class<=8||op1.tab->class==c)
+		{
+			reg_ext(op1.tab->reg+4,op1.tab->class,c);
+			outs("str ");
+			out_reg64(op1.tab->reg+4);
+			outs(",[sp,#-16]!\n");
+			return;
+		}
+		else
+		{
+			outs("mov x0,");
+			out_reg64(op1.tab->reg+4);
+			outs("\n");
+		}
 	}
 	else if(class1==0)
 	{
@@ -30,12 +40,16 @@ void gen_push(struct ins *ins)
 	else if(class1==2)
 	{
 		outs("mov64 x0,");
-		op_out_const(7,&op1);
+		op_out_const(c,&op1);
 		outs("\n");
 	}
 	else if(class1==3)
 	{
 		op_calculate_addr(&op1,0);
+	}
+	if(class1!=2&&class1!=3)
+	{
+		reg_ext(0,op1.tab->class,c);
 	}
 	outs("str x0,[sp,#-16]!\n");
 }
@@ -104,19 +118,17 @@ void gen_call(struct ins *ins,int if_float)
 	{
 		return;
 	}
-	if(if_float)
+	if(if_float==1)
 	{
-		if(op1.tab->class!=9)
-		{
-			reg_f2q(0);
-		}
+		reg_ext(0,9,op1.tab->class);
+	}
+	else if(if_float==2)
+	{
+		reg_ext(0,10,op1.tab->class);
 	}
 	else
 	{
-		if(op1.tab->class==9)
-		{
-			reg_q2f(0);
-		}
+		reg_ext(0,8,op1.tab->class);
 	}
 	if(class1==1)
 	{
@@ -129,7 +141,7 @@ void gen_call(struct ins *ins,int if_float)
 		op_mem_ldst("str",&op1,0);
 	}
 }
-void gen_retval(struct ins *ins)
+void gen_retval(struct ins *ins,int c)
 {
 	struct operand op1;
 	int class1;
@@ -165,12 +177,16 @@ void gen_retval(struct ins *ins)
 	else if(class1==2)
 	{
 		outs("mov64 x0,");
-		op_out_const(7,&op1);
+		op_out_const(c,&op1);
 		outs("\n");
 	}
 	else if(class1==3)
 	{
 		op_calculate_addr(&op1,0);
+	}
+	if(class1!=2&&class1!=3)
+	{
+		reg_ext(0,op1.tab->class,c);
 	}
 	p=ins->next;
 	while(p)

@@ -31,15 +31,13 @@ void gen_neg(struct ins *ins)
 	{
 		class2=3;
 	}
-	if(class1!=2&&class1!=3&&(op1.tab->class==9||class2!=2&&class2!=3&&op2.tab->class==9))
+	if(class1!=2&&class1!=3&&(op1.tab->class==9||op1.tab->class==10||class2!=2&&class2!=3&&(op2.tab->class==9||op2.tab->class==10)))
 	{
+		int reg;
+		reg=0;
 		if(class2==1)
 		{
-			outs("mov ");
-			out_reg64(0);
-			outs(",");
-			out_reg64(op2.tab->reg+4);
-			outs("\n");
+			reg=op2.tab->reg+4;
 		}
 		else if(class2==0)
 		{
@@ -57,33 +55,54 @@ void gen_neg(struct ins *ins)
 		{
 			op_calculate_addr(&op2,0);
 		}
-		if(class2==2||class2==3||op2.tab->class!=9)
+		if(class2==2||class2==3||op2.tab->class==10)
 		{
-			outs("scvtf d0,x0\n");
+			outs("fmov d0,");
+			out_reg64(reg);
+			outs("\n");
+		}
+		else if(op2.tab->class==9)
+		{
+			outs("fmov s0,");
+			out_reg32(reg);
+			outs("\n");
+			outs("fcvt d0,s0\n");
 		}
 		else
 		{
-			outs("fmov d0,x0\n");
+			outs("scvtf d0,");
+			out_reg64(reg);
+			outs("\n");
 		}
 		outs("fneg d0,d0\n");
-		if(op1.tab->class!=9)
+		if(class1==1)
 		{
-			outs("fcvtns x0,d0\n");
+			if(op1.tab->class==9)
+			{
+				outs("fcvt s0,d0\n");
+				outs("fmov ");
+				out_reg32(op1.tab->reg+4);
+				outs(",s0\n");
+				return;
+			}
+			else if(op1.tab->class==10)
+			{
+				outs("fmov ");
+				out_reg64(op1.tab->reg+4);
+				outs(",d0\n");
+				return;
+			}
+			else
+			{
+				outs("fcvtns ");
+				out_reg64(op1.tab->reg+4);
+				outs(",d0\n");
+				return;
+			}
 		}
 		else
 		{
 			outs("fmov x0,d0\n");
-		}
-		if(class1==1)
-		{
-			outs("mov ");
-			out_reg64(op1.tab->reg+4);
-			outs(",");
-			out_reg64(0);
-			outs("\n");
-		}
-		else
-		{
 			op_mem_ldst("str",&op1,0);
 		}
 		return;

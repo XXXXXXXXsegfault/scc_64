@@ -1,4 +1,4 @@
-void gen_push(struct ins *ins)
+void gen_push(struct ins *ins,int c)
 {
 	struct operand op1;
 	int class1;
@@ -25,20 +25,28 @@ void gen_push(struct ins *ins)
 	}
 	if(class1==1)
 	{
-		if(op1.tab->class<7)
+		if(c<=8&&op1.tab->class<=8||c==op1.tab->class)
 		{
-			reg_extend(7,op1.tab->class,&op1);
+			reg_extend(c,op1.tab->class,&op1);
+			outs("push ");
+			op_out_reg(7,&op1);
+			outs("\n");
 		}
-		outs("push ");
-		op_out_reg(7,&op1);
-		outs("\n");
+		else
+		{
+			outs("mov ");
+			op_out_reg(7,&op1);
+			outs(",%rax\n");
+			acd_extend(0,c,op1.tab->class);
+			outs("push %rax\n");
+		}
 	}
 	else
 	{
 		if(class1==2)
 		{
 			outs("mov $");
-			op_out_const(7,&op1);
+			op_out_const(c,&op1);
 			outs(",%rax\n");
 		}
 		else if(class1==0)
@@ -48,10 +56,7 @@ void gen_push(struct ins *ins)
 			outs(",");
 			out_rax(op1.tab->class);
 			outs("\n");
-			if(op1.tab->class<7)
-			{
-				acd_extend(0,7,op1.tab->class);
-			}
+			acd_extend(0,c,op1.tab->class);
 		}
 		else if(class1==3)
 		{
@@ -139,9 +144,13 @@ void gen_call(struct ins *ins,int if_float)
 	{
 		return;
 	}
-	if(if_float)
+	if(if_float==1)
 	{
 		acd_extend(0,op1.tab->class,9);
+	}
+	else if(if_float==2)
+	{
+		acd_extend(0,op1.tab->class,10);
 	}
 	else
 	{
@@ -164,7 +173,7 @@ void gen_call(struct ins *ins,int if_float)
 		outs("\n");
 	}
 }
-void gen_retval(struct ins *ins)
+void gen_retval(struct ins *ins,int c)
 {
 	struct operand op1;
 	int class1;
@@ -189,10 +198,7 @@ void gen_retval(struct ins *ins)
 	}
 	if(class1==1)
 	{
-		if(op1.tab->class<7)
-		{
-			reg_extend(7,op1.tab->class,&op1);
-		}
+		reg_extend(c,op1.tab->class,&op1);
 		outs("mov ");
 		op_out_reg(7,&op1);
 		outs(",%rax\n");
@@ -202,7 +208,7 @@ void gen_retval(struct ins *ins)
 		if(class1==2)
 		{
 			outs("mov $");
-			op_out_const(7,&op1);
+			op_out_const(c,&op1);
 			outs(",%rax\n");
 		}
 		else if(class1==0)
@@ -212,10 +218,7 @@ void gen_retval(struct ins *ins)
 			outs(",");
 			out_rax(op1.tab->class);
 			outs("\n");
-			if(op1.tab->class<7)
-			{
-				acd_extend(0,7,op1.tab->class);
-			}
+			acd_extend(0,c,op1.tab->class);
 		}
 		else if(class1==3)
 		{

@@ -1,8 +1,180 @@
-void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,struct operand *op2,struct operand *op3,char *ins)
+void gen_hfloat_basic_op(int class1,int class2,int class3,struct operand *op1,struct operand *op2,struct operand *op3,char *ins)
 {
 	if(class2==1&&class3==1)
 	{
 		if(op2->tab->class==9&&op3->tab->class==9)
+		{
+			outs("movd ");
+			op_out_reg(6,op2);
+			outs(",%xmm0\nmovd ");
+			op_out_reg(6,op3);
+			outs(",%xmm1\n");
+			outs(ins);
+			outs("%xmm1,%xmm0\n");
+			if(class1==0)
+			{
+				outs("movss %xmm0,");
+				op_out_mem(op1);
+			}
+			else
+			{
+				outs("movd %xmm0,");
+				op_out_reg(6,op1);
+			}
+			outs("\n");
+			return;
+		}
+	}
+	if(class2==0&&class3==1)
+	{
+		if(op2->tab->class==9&&op3->tab->class==9)
+		{
+			outs("movss ");
+			op_out_mem(op2);
+			outs(",%xmm0\nmovd ");
+			op_out_reg(6,op3);
+			outs(",%xmm1\n");
+			outs(ins);
+			outs("%xmm1,%xmm0\n");
+			if(class1==0)
+			{
+				outs("movss %xmm0,");
+				op_out_mem(op1);
+			}
+			else
+			{
+				outs("movd %xmm0,");
+				op_out_reg(6,op1);
+			}
+			outs("\n");
+			return;
+		}
+	}
+	if(class2==1&&class3==0)
+	{
+		if(op2->tab->class==9&&op3->tab->class==9)
+		{
+			outs("movd ");
+			op_out_reg(6,op2);
+			outs(",%xmm0\n");
+			outs(ins);
+			op_out_mem(op3);
+			outs(",%xmm0\n");
+			if(class1==0)
+			{
+				outs("movss %xmm0,");
+				op_out_mem(op1);
+			}
+			else
+			{
+				outs("movd %xmm0,");
+				op_out_reg(6,op1);
+			}
+			outs("\n");
+			return;
+		}
+	}
+	if(class2==0&&class3==0)
+	{
+		if(op2->tab->class==9&&op3->tab->class==9)
+		{
+			outs("movss ");
+			op_out_mem(op2);
+			outs(",%xmm0\n");
+			outs(ins);
+			op_out_mem(op3);
+			outs(",%xmm0\n");
+			if(class1==0)
+			{
+				outs("movss %xmm0,");
+				op_out_mem(op1);
+			}
+			else
+			{
+				outs("movd %xmm0,");
+				op_out_reg(6,op1);
+			}
+			outs("\n");
+			return;
+		}
+	}
+	if(class2==3)
+	{
+		outs("lea ");
+		op_out_mem(op2);
+		outs(",%rax\n");
+	}
+	else if(class2==0)
+	{
+		outs("mov ");
+		op_out_mem(op2);
+		outs(",");
+		out_rax(op2->tab->class);
+		outs("\n");
+		acd_extend(0,op1->tab->class,op2->tab->class);
+	}
+	else if(class2==1)
+	{
+		outs("mov ");
+		op_out_reg(8,op2);
+		outs(",%rax\n");
+		acd_extend(0,op1->tab->class,op2->tab->class);
+	}
+	else
+	{
+		outs("mov ");
+		op_out_const(9,op2);
+		outs(",%eax\n");
+	}
+	if(class3==3)
+	{
+		outs("lea ");
+		op_out_mem(op3);
+		outs(",%rcx\n");
+	}
+	else if(class3==0)
+	{
+		outs("mov ");
+		op_out_mem(op3);
+		outs(",");
+		out_rcx(op3->tab->class);
+		outs("\n");
+		acd_extend(1,op1->tab->class,op3->tab->class);
+	}
+	else if(class3==1)
+	{
+		outs("mov ");
+		op_out_reg(8,op3);
+		outs(",%rcx\n");
+		acd_extend(1,op1->tab->class,op3->tab->class);
+	}
+	else
+	{
+		outs("mov $");
+		op_out_const(9,op3);
+		outs(",%eax\n");
+	}
+	outs("movd %eax,%xmm0\n");
+	outs("movd %ecx,%xmm1\n");
+	outs(ins);
+	outs("%xmm1,%xmm0\n");
+	if(class1==0)
+	{
+		outs("movss %xmm0,");
+		op_out_mem(op1);
+	}
+	else
+	{
+		outs("movd %xmm0,");
+		op_out_reg(6,op1);
+	}
+	outs("\n");
+}
+void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,struct operand *op2,struct operand *op3,char *ins)
+{
+	if(class2==1&&class3==1)
+	{
+		if(op2->tab->class==10&&op3->tab->class==10)
 		{
 			outs("movq ");
 			op_out_reg(8,op2);
@@ -27,7 +199,7 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	}
 	if(class2==0&&class3==1)
 	{
-		if(op2->tab->class==9&&op3->tab->class==9)
+		if(op2->tab->class==10&&op3->tab->class==10)
 		{
 			outs("movsd ");
 			op_out_mem(op2);
@@ -52,7 +224,7 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	}
 	if(class2==1&&class3==0)
 	{
-		if(op2->tab->class==9&&op3->tab->class==9)
+		if(op2->tab->class==10&&op3->tab->class==10)
 		{
 			outs("movq ");
 			op_out_reg(8,op2);
@@ -76,7 +248,7 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	}
 	if(class2==0&&class3==0)
 	{
-		if(op2->tab->class==9&&op3->tab->class==9)
+		if(op2->tab->class==10&&op3->tab->class==10)
 		{
 			outs("movsd ");
 			op_out_mem(op2);
@@ -123,7 +295,7 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	else
 	{
 		outs("mov ");
-		op_out_const(9,op2);
+		op_out_const(10,op2);
 		outs(",%rax\n");
 	}
 	if(class3==3)
@@ -151,7 +323,7 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	else
 	{
 		outs("mov $");
-		op_out_const(9,op3);
+		op_out_const(10,op3);
 		outs(",%rax\n");
 	}
 	outs("movq %rax,%xmm0\n");
@@ -220,7 +392,7 @@ void gen_basic_op(struct ins *ins,char *op)
 	{
 		error(ins->line,"invalid op.");
 	}
-	if(op1.tab->class==9&&(!strcmp(op,"add")||!strcmp(op,"sub")))
+	if(op1.tab->class==10&&(!strcmp(op,"add")||!strcmp(op,"sub")))
 	{
 		if(!strcmp(op,"add"))
 		{
@@ -229,6 +401,18 @@ void gen_basic_op(struct ins *ins,char *op)
 		else
 		{
 			gen_float_basic_op(class1,class2,class3,&op1,&op2,&op3,"subsd ");
+		}
+		return;
+	}
+	if(op1.tab->class==9&&(!strcmp(op,"add")||!strcmp(op,"sub")))
+	{
+		if(!strcmp(op,"add"))
+		{
+			gen_hfloat_basic_op(class1,class2,class3,&op1,&op2,&op3,"addss ");
+		}
+		else
+		{
+			gen_hfloat_basic_op(class1,class2,class3,&op1,&op2,&op3,"subss ");
 		}
 		return;
 	}

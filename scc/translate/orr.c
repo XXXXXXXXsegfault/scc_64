@@ -8,6 +8,10 @@ void calculate_orr(struct syntax_tree *root,struct expr_ret *ret)
 	calculate_expr(root->subtrees[1],&right);
 	if(left.is_const&&right.is_const)
 	{
+		if(is_float_type(left.type)||is_float_type(right.type))
+		{
+			error(root->line,root->col,"invalid operation for floats.");
+		}
 		ret->value=left.value|right.value;
 		ret->is_lval=0;
 		ret->needs_deref=0;
@@ -31,6 +35,10 @@ void calculate_orr(struct syntax_tree *root,struct expr_ret *ret)
 	if(is_pointer_array_function(left.decl))
 	{
 		error(right.decl->line,right.decl->col,"cannot use pointer as left operand of \'|\'.");
+	}
+	if(is_float_type(left.type)||is_float_type(right.type))
+	{
+		error(root->line,root->col,"invalid operation for floats.");
 	}
 	new_name=mktmpname();
 	new_decl=syntax_tree_dup(left.decl);

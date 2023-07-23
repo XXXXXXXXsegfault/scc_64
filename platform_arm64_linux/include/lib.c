@@ -7,6 +7,8 @@ asm "str x0,[sp,#-16]!"
 asm "bl @main"
 asm "mov x8,#94"
 asm "svc #0"
+
+#define ARCH_BAD_INST asm ".long 0xffffffff"
 #include "syscall.c"
 #include "mem.c"
 #include "malloc.c"

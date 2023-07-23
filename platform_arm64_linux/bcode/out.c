@@ -73,9 +73,15 @@ void out_num(int class,unsigned long int n)
 	{
 		out_num64(n);
 	}
-	else if(class==9)
+	else if(class==10)
 	{
 		out_num64(n);
+	}
+	else if(class==9)
+	{
+		float n2;
+		n2=*(double *)&n;
+		out_num32(*(unsigned int *)&n2);
 	}
 }
 char *sgetc(char *str,char *ret)
@@ -199,24 +205,56 @@ void out_reg32(int reg)
 	outs(s);
 	free(s);
 }
-void out_reg_size(int reg,int class)
+void out_reg_size(int reg,int class,int ld)
 {
+	int reg64;
+	reg64=0;
+	if(ld&&class&1&&class<=6)
+	{
+		outs("s");
+		if(class>4)
+		{
+			outs("w");
+		}
+		reg64=1;
+	}
 	if(class==1||class==2)
 	{
 		outs("b ");
-		out_reg32(reg);
+		if(reg64)
+		{
+			out_reg64(reg);
+		}
+		else
+		{
+			out_reg32(reg);
+		}
 	}
 	if(class==3||class==4)
 	{
 		outs("h ");
-		out_reg32(reg);
+		if(reg64)
+		{
+			out_reg64(reg);
+		}
+		else
+		{
+			out_reg32(reg);
+		}
 	}
-	if(class==5||class==6)
+	if(class==5||class==6||class==9)
 	{
 		outs(" ");
-		out_reg32(reg);
+		if(reg64)
+		{
+			out_reg64(reg);
+		}
+		else
+		{
+			out_reg32(reg);
+		}
 	}
-	if(class==7||class==8||class==9)
+	if(class==7||class==8||class==10)
 	{
 		outs(" ");
 		out_reg64(reg);

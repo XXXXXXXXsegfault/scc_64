@@ -281,7 +281,7 @@ unsigned long int fconst_to_num(char *str,int *status)
 	{
 		if(str[x]=='.')
 		{
-			float a,b;
+			double a,b;
 			int s;
 			x=0;
 			s=0;
@@ -295,12 +295,12 @@ unsigned long int fconst_to_num(char *str,int *status)
 				}
 				else if(s)
 				{
-					a+=b*(float)(str[x]-'0');
+					a+=b*(double)(str[x]-'0');
 					b*=0.1;
 				}
 				else
 				{
-					a=a*10.0+(float)(str[x]-'0');
+					a=a*10.0+(double)(str[x]-'0');
 				}
 				++x;
 			}
@@ -357,6 +357,10 @@ void ins_add(char *str)
 			{
 				node->op=11;
 			}
+			if(!strcmp(node->args[0],"adro"))
+			{
+				node->op=11;
+			}
 			if(!strcmp(node->args[0],"add"))
 			{
 				node->op=13;
@@ -401,7 +405,23 @@ void ins_add(char *str)
 			{
 				node->op=3;
 			}
+			if(!strcmp(node->args[0],"pushf"))
+			{
+				node->op=3;
+			}
+			if(!strcmp(node->args[0],"pushh"))
+			{
+				node->op=3;
+			}
 			if(!strcmp(node->args[0],"retval"))
+			{
+				node->op=9;
+			}
+			if(!strcmp(node->args[0],"retvalh"))
+			{
+				node->op=9;
+			}
+			if(!strcmp(node->args[0],"retvalf"))
 			{
 				node->op=9;
 			}
@@ -412,6 +432,62 @@ void ins_add(char *str)
 			if(!strcmp(node->args[0],"call"))
 			{
 				node->op=4;
+			}
+			if(!strcmp(node->args[0],"fcall"))
+			{
+				node->op=4;
+			}
+			if(!strcmp(node->args[0],"hcall"))
+			{
+				node->op=4;
+			}
+			if(!strcmp(node->args[0],"stob"))
+			{
+				node->op=5;
+			}
+			if(!strcmp(node->args[0],"stow"))
+			{
+				node->op=5;
+			}
+			if(!strcmp(node->args[0],"stol"))
+			{
+				node->op=5;
+			}
+			if(!strcmp(node->args[0],"stoq"))
+			{
+				node->op=5;
+			}
+			if(!strcmp(node->args[0],"stof"))
+			{
+				node->op=5;
+			}
+			if(!strcmp(node->args[0],"stoh"))
+			{
+				node->op=5;
+			}
+			if(!strcmp(node->args[0],"ldob"))
+			{
+				node->op=6;
+			}
+			if(!strcmp(node->args[0],"ldow"))
+			{
+				node->op=6;
+			}
+			if(!strcmp(node->args[0],"ldol"))
+			{
+				node->op=6;
+			}
+			if(!strcmp(node->args[0],"ldoq"))
+			{
+				node->op=6;
+			}
+			if(!strcmp(node->args[0],"ldof"))
+			{
+				node->op=6;
+			}
+			if(!strcmp(node->args[0],"ldoh"))
+			{
+				node->op=6;
 			}
 			if(!strcmp(node->args[0],"stb"))
 			{
@@ -433,6 +509,10 @@ void ins_add(char *str)
 			{
 				node->op=5;
 			}
+			if(!strcmp(node->args[0],"sth"))
+			{
+				node->op=5;
+			}
 			if(!strcmp(node->args[0],"ldb"))
 			{
 				node->op=6;
@@ -450,6 +530,10 @@ void ins_add(char *str)
 				node->op=6;
 			}
 			if(!strcmp(node->args[0],"ldf"))
+			{
+				node->op=6;
+			}
+			if(!strcmp(node->args[0],"ldh"))
 			{
 				node->op=6;
 			}
@@ -577,6 +661,12 @@ void load_global_vars(void)
 				else if(!strcmp(node->args[1],"float"))
 				{
 					size=8;
+					class=10;
+					name=node->args[2];
+				}
+				else if(!strcmp(node->args[1],"hfloat"))
+				{
+					size=4;
 					class=9;
 					name=node->args[2];
 				}
@@ -847,6 +937,12 @@ void load_local_vars(void)
 				else if(!strcmp(node->args[1],"float"))
 				{
 					size=8;
+					class=10;
+					name=node->args[2];
+				}
+				else if(!strcmp(node->args[1],"hfloat"))
+				{
+					size=4;
 					class=9;
 					name=node->args[2];
 				}
@@ -1046,6 +1142,11 @@ void reg_init(void)
 				}
 				else if(!strcmp(ins->args[1],"float"))
 				{
+					class=10;
+					name=ins->args[2];
+				}
+				else if(!strcmp(ins->args[1],"hfloat"))
+				{
 					class=9;
 					name=ins->args[2];
 				}
@@ -1107,6 +1208,34 @@ void reg_init(void)
 			else if(!strcmp(ins->args[0],"adr"))
 			{
 				if(ins->count_args<3)
+				{
+					error(ins->line,"too few arguments.");
+				}
+				if(id=id_tab_find(local_id,ins->args[2]))
+				{
+					if(id->reg>=0)
+					{
+						id->reg=-1;
+						off-=size;
+						off=off&0xfffffffffffffff0;
+						id->off=off;
+						if(fstart)
+						{
+							fstart->stack_size=off;
+						}
+					}
+				}
+				else if(id=id_tab_find(args_id,ins->args[2]))
+				{
+					if(id->reg>=0)
+					{
+						id->reg=-1;
+					}
+				}
+			}
+			else if(!strcmp(ins->args[0],"adro"))
+			{
+				if(ins->count_args<4)
 				{
 					error(ins->line,"too few arguments.");
 				}
@@ -1195,6 +1324,11 @@ void reg_init(void)
 				else if(!strcmp(ins->args[1],"float"))
 				{
 					size=8;
+					name=ins->args[2];
+				}
+				else if(!strcmp(ins->args[1],"hfloat"))
+				{
+					size=4;
 					name=ins->args[2];
 				}
 				else
