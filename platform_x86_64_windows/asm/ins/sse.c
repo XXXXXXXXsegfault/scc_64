@@ -78,4 +78,6 @@ void ins_init_sse(void)
 	ins_add("cmpps $I,ADDR,%X2",0,"\x0f\xc2",2,0,0,RM|I_IMM|I_IMMB,0);
 	ins_add("cmpsd $I,ADDR,%X2","\xf3","\x0f\xc2",2,0,0,RM|I_IMM|I_IMMB,0);
 	ins_add("cmpss $I,ADDR,%X2","\xf2","\x0f\xc2",2,0,0,RM|I_IMM|I_IMMB,0);
+	ins_add("andps %X1,%X2",0,"\x0f\x54",2,0,0,RR|I_MODRM,0);
+	ins_add("orps %X1,%X2",0,"\x0f\x56",2,0,0,RR|I_MODRM,0);
 }
