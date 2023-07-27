@@ -389,9 +389,9 @@ void acd_extend(int reg,int newclass,int oldclass)
 	{
 		if(oldclass!=9&&oldclass!=10)
 		{
-			if(oldclass<5)
+			if(oldclass<7)
 			{
-				acd_extend(reg,5,oldclass);
+				acd_extend(reg,7,oldclass);
 				oldclass=5;
 			}
 			if(newclass==10)

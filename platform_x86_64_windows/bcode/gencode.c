@@ -264,9 +264,9 @@ void reg_extend(int class,int old_class,struct operand *op)
 	{
 		if(old_class!=9&&old_class!=10)
 		{
-			if(old_class<5)
+			if(old_class<7)
 			{
-				reg_extend(5,old_class,op);
+				reg_extend(7,old_class,op);
 				old_class=5;
 			}
 			if(class==10)
