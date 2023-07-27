@@ -392,7 +392,7 @@ void acd_extend(int reg,int newclass,int oldclass)
 			if(oldclass<7)
 			{
 				acd_extend(reg,7,oldclass);
-				oldclass=5;
+				oldclass=7;
 			}
 			if(newclass==10)
 			{
