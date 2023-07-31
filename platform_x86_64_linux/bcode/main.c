@@ -1,5 +1,3 @@
-#include "../../include/lib.c"
-int fdi,fdo;
 long int current_line;
 void error(int line,char *msg)
 {
@@ -25,22 +23,7 @@ int name_hash(char *str)
 }
 int readc(void)
 {
-	static unsigned char buf[65536];
-	static int x,n;
-	int n1,c;
-	if(x==n)
-	{
-		n1=read(fdi,buf,65536);
-		if(n1<=0)
-		{
-			return -1;
-		}
-		n=n1;
-		x=0;
-	}
-	c=buf[x];
-	++x;
-	return c;
+	return stream_getc();
 }
 char *read_line(void)
 {
@@ -144,6 +127,34 @@ char *sdup(char *str)
 #include "fg.c"
 #include "gencode.c"
 
+void bcode_run(void)
+{
+	char *str;
+	struct ins *node;
+	while(str=read_line())
+	{
+		ins_add(str);
+		free(str);
+	}
+	load_global_vars();
+	load_labels();
+	load_branches();
+	load_local_vars();
+	reg_init();
+	write_msg();
+	node=ins_head;
+	while(node)
+	{
+		gen_code(node);
+		node=node->next;
+	}
+
+	outs(".datasize ");
+	out_num64(data_size);
+	outs("\n");
+	out_flush();
+}
+/*
 int main(int argc,char **argv)
 {
 	char *str;
@@ -188,3 +199,4 @@ int main(int argc,char **argv)
 	close(fdo);
 	return 0;
 }
+*/

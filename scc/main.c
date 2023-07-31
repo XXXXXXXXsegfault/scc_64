@@ -1,5 +1,3 @@
-#include "../include/lib.c"
-int fdi,fdo;
 
 void error(int line,int col,char *msg)
 {
@@ -29,6 +27,20 @@ int name_hash(char *str)
 #include "parse/parse.c"
 #include "translate/translate.c"
 
+void scc_run(void)
+{
+	struct syntax_tree *root;
+	l_global_init();
+	expr_global_init();
+	type_global_init();
+	parse_global_init();
+	load_file();
+	p_current_word=l_words_head;
+	root=parse_file();
+	translate_file(root);
+	out_flush();
+}
+/*
 int main(int argc,char **argv)
 {
 	struct syntax_tree *root;
@@ -59,3 +71,4 @@ int main(int argc,char **argv)
 	close(fdo);
 	return 0;
 }
+*/

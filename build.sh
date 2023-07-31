@@ -23,35 +23,21 @@ fi
 mkdir -p test include $RELEASE
 cp -r include_generic/* platform_$1/include/* include
 bin/$1_native/scpp$PROG_SUFFIX scpp/main.c test/scpp.i
-bin/$1_native/scpp$PROG_SUFFIX scc/main.c test/scc.i
-bin/$1_native/scpp$PROG_SUFFIX platform_$2/bcode/main.c test/bcode.i
+bin/$1_native/scpp$PROG_SUFFIX platform_$2/scc_main.c test/scc.i
 bin/$1_native/scpp$PROG_SUFFIX platform_$2/asm/main.c test/asm.i
-bin/$1_native/scc$PROG_SUFFIX test/scpp.i test/scpp.bcode
-bin/$1_native/scc$PROG_SUFFIX test/scc.i test/scc.bcode
-bin/$1_native/scc$PROG_SUFFIX test/bcode.i test/bcode.bcode
-bin/$1_native/scc$PROG_SUFFIX test/asm.i test/asm.bcode
-bin/$1_native/bcode$PROG_SUFFIX test/scpp.bcode test/scpp.asm
-bin/$1_native/bcode$PROG_SUFFIX test/scc.bcode test/scc.asm
-bin/$1_native/bcode$PROG_SUFFIX test/bcode.bcode test/bcode.asm
-bin/$1_native/bcode$PROG_SUFFIX test/asm.bcode test/asm.asm
+bin/$1_native/scc$PROG_SUFFIX test/scpp.i test/scpp.asm
+bin/$1_native/scc$PROG_SUFFIX test/scc.i test/scc.asm
+bin/$1_native/scc$PROG_SUFFIX test/asm.i test/asm.asm
 bin/$1_native/asm$PROG_SUFFIX test/scpp.asm test/scpp$PROG_SUFFIX
 bin/$1_native/asm$PROG_SUFFIX test/scc.asm test/scc$PROG_SUFFIX
-bin/$1_native/asm$PROG_SUFFIX test/bcode.asm test/bcode$PROG_SUFFIX
 bin/$1_native/asm$PROG_SUFFIX test/asm.asm test/asm$PROG_SUFFIX
 cp -r platform_$2/include/* include
 test/scpp$PROG_SUFFIX scpp/main.c test/scpp.i
-test/scpp$PROG_SUFFIX scc/main.c test/scc.i
-test/scpp$PROG_SUFFIX platform_$3/bcode/main.c test/bcode.i
+test/scpp$PROG_SUFFIX platform_$3/scc_main.c test/scc.i
 test/scpp$PROG_SUFFIX platform_$3/asm/main.c test/asm.i
-test/scc$PROG_SUFFIX test/scpp.i test/scpp.bcode
-test/scc$PROG_SUFFIX test/scc.i test/scc.bcode
-test/scc$PROG_SUFFIX test/bcode.i test/bcode.bcode
-test/scc$PROG_SUFFIX test/asm.i test/asm.bcode
-test/bcode$PROG_SUFFIX test/scpp.bcode test/scpp.asm
-test/bcode$PROG_SUFFIX test/scc.bcode test/scc.asm
-test/bcode$PROG_SUFFIX test/bcode.bcode test/bcode.asm
-test/bcode$PROG_SUFFIX test/asm.bcode test/asm.asm
+test/scc$PROG_SUFFIX test/scpp.i test/scpp.asm
+test/scc$PROG_SUFFIX test/scc.i test/scc.asm
+test/scc$PROG_SUFFIX test/asm.i test/asm.asm
 test/asm$PROG_SUFFIX test/scpp.asm $RELEASE/scpp$SUFFIX
 test/asm$PROG_SUFFIX test/scc.asm $RELEASE/scc$SUFFIX
-test/asm$PROG_SUFFIX test/bcode.asm $RELEASE/bcode$SUFFIX
 test/asm$PROG_SUFFIX test/asm.asm $RELEASE/asm$SUFFIX

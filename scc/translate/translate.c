@@ -91,7 +91,7 @@ void expr_ret_release(struct expr_ret *ret)
 	syntax_tree_release(ret->decl);
 }
 void calculate_expr(struct syntax_tree *root,struct expr_ret *ret);
-struct struct_tab *struct_tab_find(struct struct_tab **tab,char *name)
+struct struct_tab *_struct_tab_find(struct struct_tab **tab,char *name)
 {
 	int hash;
 	struct struct_tab *node;
@@ -107,7 +107,27 @@ struct struct_tab *struct_tab_find(struct struct_tab **tab,char *name)
 	}
 	return 0;
 }
-void struct_tab_add(struct struct_tab **tab,char *name,struct syntax_tree *decl)
+struct struct_tab *struct_tab_find(struct struct_tab **tab,char *name)
+{
+	char *new_name;
+	char *ns;
+	struct struct_tab *ret;
+	ns=get_namespace();
+	if(ns)
+	{
+		new_name=xstrdup(ns);
+		new_name=str_s_app(new_name,"__");
+		new_name=str_s_app(new_name,name);
+		ret=_struct_tab_find(tab,new_name);
+		free(new_name);
+		if(ret)
+		{
+			return ret;
+		}
+	}
+	return _struct_tab_find(tab,name);
+}
+void _struct_tab_add(struct struct_tab **tab,char *name,struct syntax_tree *decl)
 {
 	int hash;
 	struct struct_tab *node;
@@ -117,6 +137,24 @@ void struct_tab_add(struct struct_tab **tab,char *name,struct syntax_tree *decl)
 	node->decl=decl;
 	node->next=tab[hash];
 	tab[hash]=node;
+}
+void struct_tab_add(struct struct_tab **tab,char *name,struct syntax_tree *decl)
+{
+	char *new_name;
+	char *ns;
+	struct struct_tab *ret;
+	ns=get_namespace();
+	if(ns)
+	{
+		new_name=xstrdup(ns);
+		new_name=str_s_app(new_name,"__");
+		new_name=str_s_app(new_name,name);
+		_struct_tab_add(tab,new_name,decl);
+	}
+	else
+	{
+		_struct_tab_add(tab,name,decl);
+	}
 }
 struct id_tab *id_tab_find(struct id_tab **tab,char *name)
 {
@@ -292,25 +330,12 @@ int is_global(void)
 	}
 	return 0;
 }
-char outc_buf[65536];
-int outc_x;
 void outc(char c)
 {
-	int n;
-	if(outc_x==65536)
-	{
-		write(fdo,outc_buf,outc_x);
-		outc_x=0;
-	}
-	outc_buf[outc_x]=c;
-	++outc_x;
+	stream_putc(c);
 }
 void out_flush(void)
 {
-	if(outc_x)
-	{
-		write(fdo,outc_buf,outc_x);
-	}
 }
 void c_write(char *buf,int size)
 {
