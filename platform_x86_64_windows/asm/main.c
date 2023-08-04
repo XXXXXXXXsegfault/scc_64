@@ -25,6 +25,7 @@ int name_hash(char *str)
 unsigned long int pc,data_size,data_addr;
 struct lines *l;
 int stage;
+int generate_cui;
 #define PE_OFF 0x401000
 #include "load_file.c"
 #include "dll.c"

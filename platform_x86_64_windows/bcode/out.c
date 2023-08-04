@@ -458,7 +458,7 @@ void acd_extend(int reg,int newclass,int oldclass)
 		return;
 	}
 	outs("mov");
-	if(size1==3&&size2==2&&!(newclass&1))
+	if(size1==3&&size2==2&&!(oldclass&1))
 	{
 		outs(" ");
 		out_acd(5,reg);
@@ -467,7 +467,7 @@ void acd_extend(int reg,int newclass,int oldclass)
 		outs("\n");
 		return;
 	}
-	if(newclass&1)
+	if(oldclass&1)
 	{
 		outs("s");
 	}

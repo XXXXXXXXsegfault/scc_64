@@ -23,6 +23,10 @@ void parse_pseudo_op(char *str)
 		l->needs_recompile=1;
 		pe_header.entry=pc;
 	}
+	else if(str_match(&str,"cui"))
+	{
+		generate_cui=1;
+	}
 	else if(str_match(&str,"dllcall"))
 	{
 		if(stage==0)

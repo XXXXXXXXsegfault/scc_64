@@ -191,6 +191,10 @@ void mkpe(void)
 	pe_header.image_size=data_addr+size_align(data_size)+size_align(size_imports)-0x400000;
 	pe_header.headers_size=size_align2(sizeof(pe_header));
 	pe_header.subsystem=2;
+	if(generate_cui)
+	{
+		pe_header.subsystem=3;
+	}
 	pe_header.stack_reserve=0x400000;
 	pe_header.stack_commit=0x1000;
 	pe_header.heap_reserve=0x100000;

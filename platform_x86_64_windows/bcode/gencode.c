@@ -333,7 +333,7 @@ void reg_extend(int class,int old_class,struct operand *op)
 		return;
 	}
 	outs("mov");
-	if(size1==3&&size2==2&&!(class&1))
+	if(size1==3&&size2==2&&!(old_class&1))
 	{
 		outs(" ");
 		op_out_reg(5,op);
@@ -342,7 +342,7 @@ void reg_extend(int class,int old_class,struct operand *op)
 		outs("\n");
 		return;
 	}
-	if(class&1)
+	if(old_class&1)
 	{
 		outs("s");
 	}
@@ -788,7 +788,7 @@ void gen_code(struct ins *ins)
 		}
 		else if(!strcmp(ins->args[0],"push"))
 		{
-			gen_push(ins,8);
+			gen_push(ins,7);
 		}
 		else if(!strcmp(ins->args[0],"pushh"))
 		{
@@ -812,7 +812,7 @@ void gen_code(struct ins *ins)
 		}
 		else if(!strcmp(ins->args[0],"retval"))
 		{
-			gen_retval(ins,8);
+			gen_retval(ins,7);
 		}
 		else if(!strcmp(ins->args[0],"retvalh"))
 		{

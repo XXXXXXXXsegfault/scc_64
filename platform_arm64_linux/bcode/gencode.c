@@ -1113,7 +1113,7 @@ void gen_code(struct ins *ins)
 		}
 		else if(!strcmp(ins->args[0],"push"))
 		{
-			gen_push(ins,8);
+			gen_push(ins,7);
 		}
 		else if(!strcmp(ins->args[0],"pushh"))
 		{
@@ -1137,7 +1137,7 @@ void gen_code(struct ins *ins)
 		}
 		else if(!strcmp(ins->args[0],"retval"))
 		{
-			gen_retval(ins,8);
+			gen_retval(ins,7);
 		}
 		else if(!strcmp(ins->args[0],"retvalh"))
 		{
