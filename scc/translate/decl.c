@@ -87,7 +87,8 @@ void struct_check(struct syntax_tree *type)
 void decl_check(struct syntax_tree *type,struct syntax_tree *decl)
 {
 	struct syntax_tree *t;
-	int x;
+	int x,y;
+	char *id1,*id2;
 	t=decl;
 	while(strcmp(decl->name,"Identifier"))
 	{
@@ -167,6 +168,18 @@ void decl_check(struct syntax_tree *type,struct syntax_tree *decl)
 			if(!strcmp(t->name,"function"))
 			{
 				error(t->line,t->col,"cannot use function as structure or union member.");
+			}
+			id1=get_decl_id(type->subtrees[x+1]);
+			y=x+2;
+			while(y<type->count_subtrees)
+			{
+				id2=get_decl_id(type->subtrees[y+1]);
+				t=type->subtrees[y+1];
+				if(!strcmp(id1,id2))
+				{
+					error(t->line,t->col,"duplicate member name.");
+				}
+				y+=2;
 			}
 			x+=2;
 		}
@@ -844,6 +857,25 @@ int if_type_compat(struct syntax_tree *type,struct syntax_tree *decl,struct synt
 		return 1;
 	}
 	return 0;
+}
+int is_integer_type(struct syntax_tree *type,struct syntax_tree *decl)
+{
+	int s1;
+	if(is_void(type,decl))
+	{
+		return 0;
+	}
+	s1=is_basic_type(type)&&is_basic_decl(decl)||is_pointer_array_function(decl);
+	if(!s1)
+	{
+		return 0;
+	}
+	s1=is_float_type(type)&&!is_pointer_array_function(decl);
+	if(s1)
+	{
+		return 0;
+	}
+	return 1;
 }
 struct syntax_tree *array_function_to_pointer(struct syntax_tree *decl)
 {

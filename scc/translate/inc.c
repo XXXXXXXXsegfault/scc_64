@@ -15,6 +15,10 @@ void calculate_inc(struct syntax_tree *root,struct expr_ret *ret)
 	{
 		new_name=mktmpname();
 		decl1=decl_next(result.decl);
+		if(!is_integer_type(result.type,decl1))
+		{
+			error(root->line,root->col,"incompatible type.");
+		}
 		if(is_pointer_array(decl1))
 		{
 			decl2=decl_next(decl1);
@@ -211,6 +215,10 @@ void calculate_inc(struct syntax_tree *root,struct expr_ret *ret)
 	}
 	else
 	{
+		if(!is_integer_type(result.type,result.decl))
+		{
+			error(root->line,root->col,"incompatible type.");
+		}
 		if(is_pointer_array(result.decl))
 		{
 			decl2=decl_next(result.decl);

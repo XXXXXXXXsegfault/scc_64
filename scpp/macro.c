@@ -344,8 +344,9 @@ char *do_macro_replace(char *base,char **str)
 void macro_replace(void)
 {
 	char *str,*ret,*ptr;
-	int status;
+	int status,n;
 	str=word_list_release();
+	n=0;
 	do
 	{
 		ptr=str;
@@ -356,6 +357,11 @@ void macro_replace(void)
 		}
 		if(ret)
 		{
+			++n;
+			if(n>64||strlen(ret)>2048)
+			{
+				error(current_file,current_line,"#define is too long.");
+			}
 			status=strcmp(ret,str);
 		}
 		else

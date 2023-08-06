@@ -6,8 +6,12 @@ void calculate_call(struct syntax_tree *root,struct expr_ret *ret)
 	char *name,*new_name;
 	calculate_expr(root->subtrees[0],&func);
 	deref_ptr(&func,root->line,root->col);
-	if(is_pointer_array(func.decl))
+	if(!is_function(func.decl))
 	{
+		if(!is_pointer_array(func.decl))
+		{
+			error(root->line,root->col,"calling a non-function.");
+		}
 		decl=decl_next(func.decl);
 		syntax_tree_release(func.decl);
 		func.decl=decl;
