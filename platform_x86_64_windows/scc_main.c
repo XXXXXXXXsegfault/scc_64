@@ -26,4 +26,5 @@ int main(int argc,char **argv)
 	scc_back__bcode_run();
 	close(fdi);
 	close(fdo);
+	return 0;
 }

@@ -198,7 +198,7 @@ void translate_stmt(struct syntax_tree *node)
 	}
 	if(!strcmp(node->name,"extern_decl"))
 	{
-		translate_extern_decl(node);
+		error(node->line,node->col,"\'extern\' not supported.");
 	}
 	else if(!strcmp(node->name,"expr"))
 	{
