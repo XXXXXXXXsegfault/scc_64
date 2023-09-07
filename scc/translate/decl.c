@@ -295,12 +295,14 @@ int type_cmp(struct syntax_tree *type1,struct syntax_tree *decl1,struct syntax_t
 	}
 	return 1;
 }
-void check_decl1(struct syntax_tree *type,struct syntax_tree *decl)
+void check_decl1(struct syntax_tree *type,struct syntax_tree *decl,char *name)
 {
-	char *name;
 	struct id_tab *id;
 	struct syntax_tree *decl1;
-	name=get_decl_id(decl);
+	if(name==0)
+	{
+		name=get_decl_id(decl);
+	}
 	if(!strcmp(name,"<NULL>"))
 	{
 		return;
@@ -313,12 +315,14 @@ void check_decl1(struct syntax_tree *type,struct syntax_tree *decl)
 		}
 	}
 }
-int check_decl2(struct syntax_tree *type,struct syntax_tree *decl)
+int check_decl2(struct syntax_tree *type,struct syntax_tree *decl,char *name)
 {
-	char *name;
 	struct id_tab *id;
 	struct syntax_tree *decl1;
-	name=get_decl_id(decl);
+	if(name==0)
+	{
+		name=get_decl_id(decl);
+	}
 	if(!strcmp(name,"<NULL>"))
 	{
 		return 0;
@@ -402,7 +406,7 @@ void add_decl(struct syntax_tree *type,struct syntax_tree *decl,int nodefine,int
 	if(global||no_change_name)
 	{
 		char *ns;
-		if(global&&(ns=get_namespace()))
+		if(global&&strcmp(get_decl_id(decl),"<NULL>")&&(ns=get_namespace()))
 		{
 			name=xstrdup(ns);
 			name=str_s_app(name,"__");
@@ -422,14 +426,32 @@ void add_decl(struct syntax_tree *type,struct syntax_tree *decl,int nodefine,int
 	}
 	if(nodefine)
 	{
-		check_decl1(type,decl);
+		if(global)
+		{
+			check_decl1(type,decl,name);
+		}
+		else
+		{
+			check_decl1(type,decl,0);
+		}
 	}
 	else
 	{
-		if(check_decl2(type,decl)&&class!=1)
+		if(global)
 		{
-			free(name);
-			return;
+			if(check_decl2(type,decl,name)&&class!=1)
+			{
+				free(name);
+				return;
+			}
+		}
+		else
+		{
+			if(check_decl2(type,decl,0)&&class!=1)
+			{
+				free(name);
+				return;
+			}
 		}
 	}
 	if(class==0)
