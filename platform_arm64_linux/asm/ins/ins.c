@@ -222,20 +222,23 @@ int ins_write_mov64(struct ins_args *args,long priv)
 	ins=0xd2800000|c<<5|args->reg1;
 	swrite(&ins,4);
 	n>>=16;
-	if(c=n&0xffff)
+	if(n)
 	{
+		c=n&0xffff;
 		ins=0xf2a00000|c<<5|args->reg1;
 		swrite(&ins,4);
 	}
 	n>>=16;
-	if(c=n&0xffff)
+	if(n)
 	{
+		c=n&0xffff;
 		ins=0xf2c00000|c<<5|args->reg1;
 		swrite(&ins,4);
 	}
 	n>>=16;
-	if(c=n&0xffff)
+	if(n)
 	{
+		c=n&0xffff;
 		ins=0xf2e00000|c<<5|args->reg1;
 		swrite(&ins,4);
 	}

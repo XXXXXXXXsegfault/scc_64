@@ -30,6 +30,8 @@ int name_hash(char *str)
 void scc_run(void)
 {
 	struct syntax_tree *root;
+	struct label_tab *node,*p;
+	int index;
 	l_global_init();
 	expr_global_init();
 	type_global_init();
@@ -38,6 +40,23 @@ void scc_run(void)
 	p_current_word=l_words_head;
 	root=parse_file();
 	translate_file(root);
+	node=label_use;
+	while(node)
+	{
+		index=name_hash(node->name);
+		p=label_def[index];
+		while(p)
+		{
+			if(!strcmp(p->name,node->name))
+			{
+				goto Defined;
+			}
+			p=p->next;
+		}
+		error(node->line,node->col,"label not defined.");
+Defined:
+		node=node->next;
+	}
 	out_flush();
 }
 /*

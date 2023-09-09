@@ -32,6 +32,13 @@ struct id_tab
 	struct id_tab *next;
 	long int def;
 };
+struct label_tab
+{
+	char *name;
+	long line;
+	long col;
+	struct label_list *next;
+} *label_use,*label_def[1021];
 struct struct_tab
 {
 	char *name;

@@ -134,6 +134,7 @@ void translate_break(struct syntax_tree *root)
 void translate_goto(struct syntax_tree *root)
 {
 	char *name;
+	struct label_tab *node;
 	c_write("bal ",4);
 	name=xstrdup("_$CL$");
 	name=str_i_app(name,t_env.func_num);
@@ -141,11 +142,18 @@ void translate_goto(struct syntax_tree *root)
 	name=str_s_app(name,root->subtrees[0]->value);
 	c_write(name,strlen(name));
 	c_write("\n",1);
-	free(name);
+	node=xmalloc(sizeof(*node));
+	node->name=name;
+	node->line=root->line;
+	node->col=root->col;
+	node->next=label_use;
+	label_use=node;
 }
 void translate_label(struct syntax_tree *root)
 {
 	char *name;
+	struct label_tab *node;
+	int index;
 	c_write("label ",6);
 	name=xstrdup("_$CL$");
 	name=str_i_app(name,t_env.func_num);
@@ -153,7 +161,13 @@ void translate_label(struct syntax_tree *root)
 	name=str_s_app(name,root->subtrees[0]->value);
 	c_write(name,strlen(name));
 	c_write("\n",1);
-	free(name);
+	node=xmalloc(sizeof(*node));
+	node->name=name;
+	node->line=root->line;
+	node->col=root->col;
+	index=name_hash(name);
+	node->next=label_def[index];
+	label_def[index]=node;
 }
 void translate_ifelse(struct syntax_tree *root)
 {
