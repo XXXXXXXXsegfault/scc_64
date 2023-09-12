@@ -37,7 +37,7 @@ struct label_tab
 	char *name;
 	long line;
 	long col;
-	struct label_list *next;
+	struct label_tab *next;
 } *label_use,*label_def[1021];
 struct struct_tab
 {
