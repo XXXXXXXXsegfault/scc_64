@@ -139,12 +139,12 @@ void gen_mod(struct ins *ins)
 		if(sign)
 		{
 			outs("mov %al,%ah\n");
-			outs("shr $7,%ah");
+			outs("shr $7,%ah\n");
 			outs("neg %ah\n");
 		}
 		else
 		{
-			outs("xor %ah,%ah");
+			outs("xor %ah,%ah\n");
 		}
 	}
 	else
