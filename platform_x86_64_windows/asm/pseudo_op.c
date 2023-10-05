@@ -5,7 +5,7 @@ void parse_pseudo_op(char *str)
 	if(str_match(&str,"string"))
 	{
 		word=read_word(&str);
-		if(*word!='\"')
+		if(!word||*word!='\"')
 		{
 			error(l->line,"expected string after \'.string\'.");
 		}
@@ -34,7 +34,7 @@ void parse_pseudo_op(char *str)
 			char *dllname,*funname;
 			dllname=0;
 			word=read_word(&str);
-			if(*word!='\"')
+			if(!word||*word!='\"')
 			{
 				error(l->line,"expected DLL name after \'.dllcall\'.");
 			}

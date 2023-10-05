@@ -5,7 +5,7 @@ void parse_pseudo_op(char *str)
 	if(str_match(&str,"string"))
 	{
 		word=read_word(&str);
-		if(*word!='\"')
+		if(!word||*word!='\"')
 		{
 			error(l->line,"expected string after \'.string\'.");
 		}
@@ -96,25 +96,6 @@ void parse_pseudo_op(char *str)
 				soutc(0);
 			}
 			l->needs_recompile=1;
-		}
-	}
-	else if(str_match(&str,"addr"))
-	{
-		word=read_word(&str);
-		if(word)
-		{
-			val=const_to_num(word);
-			free(word);
-			pc=val;
-			l->needs_recompile=1;
-		}
-	}
-	else if(str_match(&str,"dataaddr"))
-	{
-		word=read_word(&str);
-		if(word)
-		{
-			data_addr=const_to_num(word);
 		}
 	}
 	else if(str_match(&str,"align"))
