@@ -52,4 +52,8 @@ void ins_init_basic_op(void)
 	ins_add("sub X1,X2,#I","1 1 0 1 0 0 0 1 0 0 I12 RS2 RS1",0,0);
 	ins_add("adds X1,X2,#I","1 0 1 1 0 0 0 1 0 0 I12 RS2 R1",0,0);
 	ins_add("subs X1,X2,#I","1 1 1 1 0 0 0 1 0 0 I12 RS2 R1",0,0);
+
+	ins_add("subs W1,W2,W3","0 1 1 0 1 0 1 1 0 0 0 R3 0 0 0 0 0 0 RS2 R1",0,0);
+	ins_add("adds W1,W2,#I","0 0 1 1 0 0 0 1 0 0 I12 RS2 R1",0,0);
+	ins_add("subs W1,W2,#I","0 1 1 1 0 0 0 1 0 0 I12 RS2 R1",0,0);
 }

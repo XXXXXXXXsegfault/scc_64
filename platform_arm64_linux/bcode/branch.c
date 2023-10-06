@@ -224,6 +224,14 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 	{
 		sign=0;
 	}
+	if(c<6)
+	{
+		c=6;
+	}
+	if(c==7)
+	{
+		c=8;
+	}
 	if(class1==1&&c!=9&&c!=10)
 	{
 		reg_ext(op1.tab->reg+4,op1.tab->class,c);
@@ -237,19 +245,38 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 	{
 		if(class2==1)
 		{
-			outs("subs xzr,");
-			out_reg64(op1.tab->reg+4);
-			outs(",");
-			out_reg64(op2.tab->reg+4);
-			outs("\n");
+			if(c==6)
+			{
+				outs("subs wzr,");
+				out_reg32(op1.tab->reg+4);
+				outs(",");
+				out_reg32(op2.tab->reg+4);
+				outs("\n");
+			}
+			else
+			{
+				outs("subs xzr,");
+				out_reg64(op1.tab->reg+4);
+				outs(",");
+				out_reg64(op2.tab->reg+4);
+				outs("\n");
+			}
 			s=1;
 		}
 		if(class2==2)
 		{
 			if(op2.type==2&&op2.value<4096)
 			{
-				outs("subs xzr,");
-				out_reg64(op1.tab->reg+4);
+				if(c==6)
+				{
+					outs("subs wzr,");
+					out_reg32(op1.tab->reg+4);
+				}
+				else
+				{
+					outs("subs xzr,");
+					out_reg64(op1.tab->reg+4);
+				}
 				outs(",#");
 				op_out_const(7,&op2);
 				outs("\n");
@@ -257,8 +284,16 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 			}
 			if(op2.type==2&&op2.value>0xfffffffffffff000)
 			{
-				outs("adds xzr,");
-				out_reg64(op1.tab->reg+4);
+				if(c==6)
+				{
+					outs("adds wzr,");
+					out_reg32(op1.tab->reg+4);
+				}
+				else
+				{
+					outs("adds xzr,");
+					out_reg64(op1.tab->reg+4);
+				}
 				outs(",#");
 				out_num64(-op2.value);
 				outs("\n");
@@ -268,9 +303,18 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 		if(class2==0)
 		{
 			op_mem_ldst("ldr",&op2,2);
-			outs("subs xzr,");
-			out_reg64(op1.tab->reg+4);
-			outs(",x2\n");
+			if(c==6)
+			{
+				outs("subs wzr,");
+				out_reg32(op1.tab->reg+4);
+				outs(",w2\n");
+			}
+			else
+			{
+				outs("subs xzr,");
+				out_reg64(op1.tab->reg+4);
+				outs(",x2\n");
+			}
 			s=1;
 		}
 	}
@@ -279,10 +323,20 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 		if(class2==1)
 		{
 			op_mem_ldst("ldr",&op1,1);
-			outs("subs xzr,");
-			out_reg64(1);
-			outs(",");
-			out_reg64(op2.tab->reg+4);
+			if(c==6)
+			{
+				outs("subs wzr,");
+				out_reg32(1);
+				outs(",");
+				out_reg32(op2.tab->reg+4);
+			}
+			else
+			{
+				outs("subs xzr,");
+				out_reg64(1);
+				outs(",");
+				out_reg64(op2.tab->reg+4);
+			}
 			outs("\n");
 			s=1;
 		}
@@ -291,8 +345,16 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 			if(op2.type==2&&op2.value<4096)
 			{
 				op_mem_ldst("ldr",&op1,1);
-				outs("subs xzr,");
-				out_reg64(1);
+				if(c==6)
+				{
+					outs("subs wzr,");
+					out_reg32(1);
+				}
+				else
+				{
+					outs("subs xzr,");
+					out_reg64(1);
+				}
 				outs(",#");
 				op_out_const(7,&op2);
 				outs("\n");
@@ -301,8 +363,16 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 			if(op2.type==2&&op2.value>=0xfffffffffffff000)
 			{
 				op_mem_ldst("ldr",&op1,1);
-				outs("adds xzr,");
-				out_reg64(1);
+				if(c==6)
+				{
+					outs("adds wzr,");
+					out_reg32(1);
+				}
+				else
+				{
+					outs("adds xzr,");
+					out_reg64(1);
+				}
 				outs(",#");
 				out_num64(-op2.value);
 				outs("\n");
@@ -414,7 +484,14 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 		}
 		else
 		{
-			outs("subs xzr,x1,x2\n");
+			if(c==6)
+			{
+				outs("subs wzr,w1,w2\n");
+			}
+			else
+			{
+				outs("subs xzr,x1,x2\n");
+			}
 		}
 	}
 	if(sign)

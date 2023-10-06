@@ -687,6 +687,10 @@ void reg_h2f(int reg)
 }
 void reg_ext(int reg,int class,int new_class)
 {
+	if(class==new_class||new_class<=8&&class-1>>1==new_class-1>>1)
+	{
+		return;
+	}
 	if(class==1)
 	{
 		outs("sxtb ");

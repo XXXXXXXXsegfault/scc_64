@@ -21,16 +21,6 @@ void gen_float_basic_op(int class1,int class2,int class3,struct operand *op1,str
 	{
 		fins=ins;
 	}
-	/*
-	if(class2==1)
-	{
-		reg_ext(op2->tab->reg+4,op2->tab->class,10);
-	}
-	if(class3==1)
-	{
-		reg_ext(op3->tab->reg+4,op3->tab->class,10);
-	}
-	*/
 	if(class2==1)
 	{
 		outs("mov x1,");
@@ -134,16 +124,6 @@ void gen_hfloat_basic_op(int class1,int class2,int class3,struct operand *op1,st
 	{
 		fins=ins;
 	}
-	/*
-	if(class2==1)
-	{
-		reg_ext(op2->tab->reg+4,op2->tab->class,9);
-	}
-	if(class3==1)
-	{
-		reg_ext(op3->tab->reg+4,op3->tab->class,9);
-	}
-	*/
 	if(class2==1)
 	{
 		outs("mov x1,");
@@ -228,6 +208,7 @@ void gen_basic_op(struct ins *ins,char *op)
 {
 	struct operand op1,op2,op3;
 	int class1,class2,class3;
+	int c;
 	get_operand(ins,1,&op1);
 	get_operand(ins,2,&op2);
 	get_operand(ins,3,&op3);
@@ -284,13 +265,50 @@ void gen_basic_op(struct ins *ins,char *op)
 		gen_float_basic_op(class1,class2,class3,&op1,&op2,&op3,op);
 		return;
 	}
-	if(class2==1)
+	if(!strcmp(op,"sdiv")||!strcmp(op,"udiv")||!strcmp(op,"asr")||!strcmp(op,"lsr"))
 	{
-		reg_ext(op2.tab->reg+4,op2.tab->class,8);
+		if(class2==1)
+		{
+			reg_ext(op2.tab->reg+4,op2.tab->class,8);
+		}
+		if(class3==1)
+		{
+			reg_ext(op3.tab->reg+4,op3.tab->class,8);
+		}
 	}
-	if(class3==1)
+	else
 	{
-		reg_ext(op3.tab->reg+4,op3.tab->class,8);
+		c=-1;
+		if(class2==1||class2==0)
+		{
+			if(op2.tab->class>c)
+			{
+				c=op2.tab->class;
+			}
+		}
+		if(class3==1||class3==0)
+		{
+			if(op3.tab->class>c)
+			{
+				c=op3.tab->class;
+			}
+		}
+		if(op1.tab->class>c)
+		{
+			c=op1.tab->class;
+		}
+		if(c>8)
+		{
+			c=8;
+		}
+		if(class2==1)
+		{
+			reg_ext(op2.tab->reg+4,op2.tab->class,c);
+		}
+		if(class3==1)
+		{
+			reg_ext(op3.tab->reg+4,op3.tab->class,c);
+		}
 	}
 	if(class1==1)
 	{
