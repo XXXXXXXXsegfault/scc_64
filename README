@@ -1,8 +1,29 @@
 Building
 
-SCC can run on x86_64_linux, arm64_linux, x86_64_windows.
+SCC can be built and run on x86_64_linux, arm64_linux, and x86_64_windows.
 
-To build SCC, run ./build <build_platform> <host_platform> <target_platform>.
-The executables will be in the release_<compiler-type> directory.
+To build SCC, run "./build.sh <build_platform> <host_platform> <target_platform>".
+The generated compilers will be in the "release_*" directory.
 
 
+Note
+
+SCC uses a C-like syntax, but it is not fully compatible with standard C.
+
+Many assembly instructions are not supported. If you want to add supports
+for specific assembly instructions, please modify the
+"platform_PLATFORM/asm/ins/ins.c" file.
+
+On Linux, SCC does not support dynamic linking.
+
+See "examples" for more details.
+
+Usage
+
+To compile a source file using SCC, use the following commands:
+
+> scpp source.c tmp.i
+> scc tmp.i tmp.asm
+> asm tmp.asm executable debug.asmmap
+
+The "debug.asmmap" argument is optional.
