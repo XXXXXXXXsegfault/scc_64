@@ -16,7 +16,6 @@ for specific assembly instructions, please modify the
 
 On Linux, SCC does not support dynamic linking.
 
-See "examples" for more details.
 
 Usage
 
