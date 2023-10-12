@@ -58,6 +58,7 @@ struct control_labels
 	long int l3;
 	struct control_labels *next;
 };
+int stkoverflowprot_state;
 char *current_namespace;
 char *get_namespace(void)
 {
@@ -388,6 +389,14 @@ void translate_file(struct syntax_tree *root)
 		else if(!strcmp(root->subtrees[x]->name,"asm"))
 		{
 			translate_asm(root->subtrees[x]);
+		}
+		else if(!strcmp(root->subtrees[x]->name,"stkofp_on"))
+		{
+			stkoverflowprot_state=1;
+		}
+		else if(!strcmp(root->subtrees[x]->name,"stkofp_off"))
+		{
+			stkoverflowprot_state=0;
 		}
 		++x;
 	}

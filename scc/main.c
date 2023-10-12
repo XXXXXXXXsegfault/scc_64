@@ -1,4 +1,3 @@
-
 void error(int line,int col,char *msg)
 {
 	char *str;

@@ -537,3 +537,25 @@ struct syntax_tree *parse_fundef(void)
 	}
 	return 0;
 }
+struct syntax_tree *parse_stackoverflowprotection_on(void)
+{
+	struct syntax_tree *ret,*node;
+	if(strcmp(cstr,"stackoverflowprotection_on"))
+	{
+		return 0;
+	}
+	ret=mkst("stkofp_on",0,line,col);
+	next();
+	return ret;
+}
+struct syntax_tree *parse_stackoverflowprotection_off(void)
+{
+	struct syntax_tree *ret,*node;
+	if(strcmp(cstr,"stackoverflowprotection_off"))
+	{
+		return 0;
+	}
+	ret=mkst("stkofp_off",0,line,col);
+	next();
+	return ret;
+}

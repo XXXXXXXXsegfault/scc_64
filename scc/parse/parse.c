@@ -150,6 +150,14 @@ struct syntax_tree *parse_file(void)
 		{
 			st_add_subtree(ret,node);
 		}
+		else if(node=parse_stackoverflowprotection_on())
+		{
+			st_add_subtree(ret,node);
+		}
+		else if(node=parse_stackoverflowprotection_off())
+		{
+			st_add_subtree(ret,node);
+		}
 		else
 		{
 			break;
@@ -190,4 +198,6 @@ void parse_global_init(void)
 	keyw_list[19]="while";
 	keyw_list[20]="asm";
 	keyw_list[21]="namespace";
+	keyw_list[22]="stackoverflowprotection_on";
+	keyw_list[23]="stackoverflowprotection_off";
 }

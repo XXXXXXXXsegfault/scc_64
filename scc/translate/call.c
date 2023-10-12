@@ -4,6 +4,16 @@ void calculate_call(struct syntax_tree *root,struct expr_ret *ret)
 	struct syntax_tree *type,*decl,*decl1;
 	struct expr_ret result,func;
 	char *name,*new_name;
+	char *stk_tmpname;
+	if(stkoverflowprot_state)
+	{
+		stk_tmpname=mktmpname();
+		c_write("local u64 ",10);
+		c_write(stk_tmpname,strlen(stk_tmpname));
+		c_write("\ncall ",6);
+		c_write(stk_tmpname,strlen(stk_tmpname));
+		c_write(" __stackdepth_inc\n",18);
+	}
 	calculate_expr(root->subtrees[0],&func);
 	deref_ptr(&func,root->line,root->col);
 	if(!is_function(func.decl))
@@ -116,4 +126,11 @@ void calculate_call(struct syntax_tree *root,struct expr_ret *ret)
 	ret->needs_deref=0;
 
 	expr_ret_release(&func);
+	if(stkoverflowprot_state)
+	{
+		c_write("call ",5);
+		c_write(stk_tmpname,strlen(stk_tmpname));
+		c_write(" __stackdepth_dec\n",18);
+		free(stk_tmpname);
+	}
 }
