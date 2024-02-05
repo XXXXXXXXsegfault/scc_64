@@ -37,7 +37,7 @@ struct pe_header
 	unsigned int udata_size;
 	unsigned int entry;
 	unsigned int code_base;
-	unsigned long image_base; //0x400000
+	unsigned long image_base; //PE_BASE
 	unsigned int align; // 4096
 	unsigned int file_align; //4096
 	unsigned short osver[2];
@@ -59,6 +59,8 @@ struct pe_header
 	struct pe_section sections[3];
 } pe_header;
 unsigned long int spos;
+int save_file,checksum_stage,checksum_word;
+unsigned long int pe_checksum,pe_fsize;
 void swrite(void *buf,unsigned long int size)
 {
 	unsigned char *new_data;
@@ -94,6 +96,23 @@ int outc_x;
 void outc(char c)
 {
 	int n;
+	if(!save_file)
+	{
+		if(checksum_stage)
+		{
+			checksum_word|=(unsigned int)(unsigned char)c<<8;
+			checksum_stage=0;
+			pe_checksum+=checksum_word;
+			pe_checksum=(pe_checksum&0xffff)+(pe_checksum>>16)&0xffff;
+		}
+		else
+		{
+			checksum_word=(unsigned int)(unsigned char)c;
+			checksum_stage=1;
+		}
+		++pe_fsize;
+		return;
+	}
 	if(outc_x==65536)
 	{
 		write(fdo,outc_buf,outc_x);
@@ -104,6 +123,10 @@ void outc(char c)
 }
 void out_flush(void)
 {
+	if(!save_file)
+	{
+		return;
+	}
 	if(outc_x)
 	{
 		write(fdo,outc_buf,outc_x);
@@ -157,13 +180,15 @@ void file_pad(int size)
 	{
 		size=0x200-size;
 	}
-	write(fdo,buf,size);
+	c_write(buf,size);
 }
-void mkpe(void)
+void _mkpe(void)
 {
 	int x;
 	pe_header.mz_sign=0x5a4d;
+	memcpy(pe_header.pad,"\x90\x00\x03\x00\x00\x00\x04\x00\x00\x00\xff\xff\x00\x00\xb8\x00\x00\x00\x00\x00\x00\x00\x40\x00\x00\x00\x00\x00\x00\x00",30);
 	pe_header.pe_off=0x80;
+	memcpy(pe_header.pad2,"\x0e\x1f\xba\x0e\x00\xb4\x09\xcd\x21\xb8\x01\x4c\xcd\x21This program cannot be run in DOS mode.\r\r\n$",57);
 	pe_header.pe_sign=0x4550;
 	pe_header.machine=0x8664;
 	pe_header.num_sections=3;
@@ -178,36 +203,43 @@ void mkpe(void)
 	pe_header.optheader_size=240;
 	pe_header.characteristics=0x27;
 	pe_header.magic=0x20b;
-	pe_header.code_size=data_addr-0x1000-0x400000;
+	pe_header.code_size=data_addr-0x1000-PE_BASE;
 	pe_header.udata_size=size_align(data_size);
 	pe_header.code_base=0x1000;
-	pe_header.image_base=0x400000;
-	pe_header.entry-=0x400000;
+	pe_header.image_base=PE_BASE;
+	if(!save_file)
+	{
+		pe_header.entry-=PE_BASE;
+	}
 	pe_header.align=4096;
 	pe_header.file_align=512;
 	pe_header.osver[0]=4;
 	pe_header.subsystem_ver[0]=5;
 	pe_header.subsystem_ver[1]=2;
-	pe_header.image_size=data_addr+size_align(data_size)+size_align(size_imports)-0x400000;
+	pe_header.image_size=data_addr+size_align(data_size)+size_align(size_imports)-PE_BASE;
 	pe_header.headers_size=size_align2(sizeof(pe_header));
+	if(save_file)
+	{
+		pe_header.checksum=pe_checksum;
+	}
 	pe_header.subsystem=2;
 	if(generate_cui)
 	{
 		pe_header.subsystem=3;
 	}
-	pe_header.stack_reserve=0x400000;
+	pe_header.stack_reserve=PE_BASE;
 	pe_header.stack_commit=0x1000;
 	pe_header.heap_reserve=0x100000;
 	pe_header.heap_commit=0x1000;
 	pe_header.num_ddirents=16;
 	if(size_imports)
 	{
-		pe_header.ddirents[1].vaddr=data_addr-0x400000+size_align(data_size)+size_imports-
+		pe_header.ddirents[1].vaddr=data_addr-PE_BASE+size_align(data_size)+size_imports-
 		name_seg_size-20*(function_tab_size+1);
 		pe_header.ddirents[1].size=20*(function_tab_size+1);
 	}
 	strcpy(pe_header.sections[0].name,".text");
-	pe_header.sections[0].vsize=data_addr-0x400000-0x1000;
+	pe_header.sections[0].vsize=data_addr-PE_BASE-0x1000;
 	pe_header.sections[0].vaddr=0x1000;
 	pe_header.sections[0].dsize=size_align2(spos);
 	pe_header.sections[0].dataptr=0x200;
@@ -217,7 +249,7 @@ void mkpe(void)
 	{
 		strcpy(pe_header.sections[1].name,".bss");
 		pe_header.sections[1].vsize=size_align(data_size);
-		pe_header.sections[1].vaddr=data_addr-0x400000;
+		pe_header.sections[1].vaddr=data_addr-PE_BASE;
 		pe_header.sections[1].dsize=0;
 		pe_header.sections[1].dataptr=0;
 		pe_header.sections[1].characteristics=0xc0000080;
@@ -227,12 +259,12 @@ void mkpe(void)
 	{
 		strcpy(pe_header.sections[x].name,".rdata");
 		pe_header.sections[x].vsize=size_align(size_imports);
-		pe_header.sections[x].vaddr=data_addr-0x400000+size_align(data_size);
+		pe_header.sections[x].vaddr=data_addr-PE_BASE+size_align(data_size);
 		pe_header.sections[x].dsize=size_align2(size_imports);
 		pe_header.sections[x].dataptr=0x200+size_align2(spos);
 		pe_header.sections[x].characteristics=0xc0000040;
 	}
-	write(fdo,&pe_header,sizeof(pe_header));
+	c_write(&pe_header,sizeof(pe_header));
 	file_pad(sizeof(pe_header));
 	l=lines_head;
 	while(l)
@@ -253,7 +285,6 @@ void mkpe(void)
 		}
 		l=l->next;
 	}
-	out_flush();
 	file_pad(spos);
 	if(size_imports)
 	{
@@ -293,7 +324,18 @@ void mkpe(void)
 		c_write(&val,4);
 		c_write(&val,4);
 		c_write(name_seg,name_seg_size);
-		out_flush();
 		file_pad(size_imports);
 	}
+	out_flush();
+}
+void mkpe(void)
+{
+	int fd;
+	fd=fde;
+	fde=-1;
+	_mkpe();
+	pe_checksum+=pe_fsize;
+	save_file=1;
+	fde=fd;
+	_mkpe();
 }

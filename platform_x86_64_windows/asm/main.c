@@ -27,6 +27,7 @@ struct lines *l;
 int stage;
 int generate_cui;
 #define PE_OFF 0x401000
+#define PE_BASE 0x400000
 #include "load_file.c"
 #include "dll.c"
 #include "pe.c"
@@ -140,7 +141,7 @@ int main(int argc,char **argv)
 		l=l->next;
 	}
 	stage=1;
-	data_addr=size_align(spos)+0x1000+0x400000;
+	data_addr=size_align(spos)+0x1000+PE_BASE;
 	do
 	{
 		s=0;

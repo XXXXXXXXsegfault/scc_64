@@ -108,7 +108,7 @@ void dll_import_write(void)
 	struct lines *l;
 	int x,y;
 	unsigned long val,*t1;
-	rdata_addr=data_addr-0x400000+size_align(data_size);
+	rdata_addr=data_addr-PE_BASE+size_align(data_size);
 	l=lines_head;
 	while(l)
 	{
@@ -129,7 +129,7 @@ void dll_import_write(void)
 		x=0;
 		while(x<function_tab[y].num_funs)
 		{
-			val=rdata_addr+import_tab_off+0x400000;
+			val=rdata_addr+import_tab_off+PE_BASE;
 			memcpy(function_tab[y].l[x]->ins_buf+1,&val,4);
 			t1=xmalloc(sizeof(long)*(function_addr_tab_size+1));
 			memcpy(t1,function_addr_tab,sizeof(long)*function_addr_tab_size);
