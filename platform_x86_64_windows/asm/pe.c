@@ -59,7 +59,7 @@ struct pe_header
 	struct pe_section sections[3];
 } pe_header;
 unsigned long int spos;
-int save_file,checksum_stage,checksum_word;
+int save_file,checksum_stage,checksum_word,checksum_carry;
 unsigned long int pe_checksum,pe_fsize;
 void swrite(void *buf,unsigned long int size)
 {
@@ -102,8 +102,9 @@ void outc(char c)
 		{
 			checksum_word|=(unsigned int)(unsigned char)c<<8;
 			checksum_stage=0;
-			pe_checksum+=checksum_word;
-			pe_checksum=(pe_checksum&0xffff)+(pe_checksum>>16)&0xffff;
+			pe_checksum+=checksum_word+checksum_carry;
+			checksum_carry=pe_checksum>>16&1;
+			pe_checksum&=0xffff;
 		}
 		else
 		{
@@ -334,7 +335,7 @@ void mkpe(void)
 	fd=fde;
 	fde=-1;
 	_mkpe();
-	pe_checksum+=pe_fsize;
+	pe_checksum+=pe_fsize+checksum_carry;
 	save_file=1;
 	fde=fd;
 	_mkpe();
