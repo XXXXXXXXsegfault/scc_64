@@ -687,6 +687,138 @@ int parse_freg(char **str)
 	}
 	return -1;
 }
+int parse_qreg(char **str)
+{
+	if(str_match2(str,"q10",3))
+	{
+		return 10;
+	}
+	if(str_match2(str,"q11",3))
+	{
+		return 11;
+	}
+	if(str_match2(str,"q12",3))
+	{
+		return 12;
+	}
+	if(str_match2(str,"q13",3))
+	{
+		return 13;
+	}
+	if(str_match2(str,"q14",3))
+	{
+		return 14;
+	}
+	if(str_match2(str,"q15",3))
+	{
+		return 15;
+	}
+	if(str_match2(str,"q16",3))
+	{
+		return 16;
+	}
+	if(str_match2(str,"q17",3))
+	{
+		return 17;
+	}
+	if(str_match2(str,"q18",3))
+	{
+		return 18;
+	}
+	if(str_match2(str,"q19",3))
+	{
+		return 19;
+	}
+	if(str_match2(str,"q20",3))
+	{
+		return 20;
+	}
+	if(str_match2(str,"q21",3))
+	{
+		return 21;
+	}
+	if(str_match2(str,"q22",3))
+	{
+		return 22;
+	}
+	if(str_match2(str,"q23",3))
+	{
+		return 23;
+	}
+	if(str_match2(str,"q24",3))
+	{
+		return 24;
+	}
+	if(str_match2(str,"q25",3))
+	{
+		return 25;
+	}
+	if(str_match2(str,"q26",3))
+	{
+		return 26;
+	}
+	if(str_match2(str,"q27",3))
+	{
+		return 27;
+	}
+	if(str_match2(str,"q28",3))
+	{
+		return 28;
+	}
+	if(str_match2(str,"q29",3))
+	{
+		return 29;
+	}
+	if(str_match2(str,"q30",3))
+	{
+		return 30;
+	}
+	if(str_match2(str,"q31",3))
+	{
+		return 31;
+	}
+	if(str_match2(str,"q0",2))
+	{
+		return 0;
+	}
+	if(str_match2(str,"q1",2))
+	{
+		return 1;
+	}
+	if(str_match2(str,"q2",2))
+	{
+		return 2;
+	}
+	if(str_match2(str,"q3",2))
+	{
+		return 3;
+	}
+	if(str_match2(str,"q4",2))
+	{
+		return 4;
+	}
+	if(str_match2(str,"q5",2))
+	{
+		return 5;
+	}
+	if(str_match2(str,"q6",2))
+	{
+		return 6;
+	}
+	if(str_match2(str,"q7",2))
+	{
+		return 7;
+	}
+	if(str_match2(str,"q8",2))
+	{
+		return 8;
+	}
+	if(str_match2(str,"q9",2))
+	{
+		return 9;
+	}
+	return -1;
+}
 struct ins_args
 {
 	char reg1;
@@ -760,6 +892,38 @@ int get_ins_args(char *input,char *format,struct ins_args *args)
 		else if(!strcmp(word,"W4"))
 		{
 			if((args->reg4=parse_reg32(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"Q1"))
+		{
+			if((args->reg1=parse_qreg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"Q2"))
+		{
+			if((args->reg2=parse_qreg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"Q3"))
+		{
+			if((args->reg3=parse_qreg(&input))==-1)
+			{
+				free(word);
+				return -1;
+			}
+		}
+		else if(!strcmp(word,"Q4"))
+		{
+			if((args->reg4=parse_qreg(&input))==-1)
 			{
 				free(word);
 				return -1;

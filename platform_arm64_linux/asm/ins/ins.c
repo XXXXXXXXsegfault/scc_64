@@ -147,6 +147,15 @@ int write_default_ins(char *encoding,struct ins_args *args)
 			}
 			ins=ins<<7|args->imm>>3&0x7f;
 		}
+		else if(!strcmp(word,"Is7m16"))
+		{
+			if(args->imm&15||args->imm<0xfffffffffffffc00&&args->imm>0x3ff)
+			{
+				free(word);
+				return 1;
+			}
+			ins=ins<<7|args->imm>>4&0x7f;
+		}
 		free(word);
 	}
 	swrite(&ins,4);
