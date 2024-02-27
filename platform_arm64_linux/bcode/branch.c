@@ -222,7 +222,7 @@ void gen_branch(struct ins *ins,char *op_1,char *op_2)
 	}
 	if(c==9||c==10)
 	{
-		sign=0;
+		sign=1;
 	}
 	if(c<6)
 	{

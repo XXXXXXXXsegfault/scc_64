@@ -86,5 +86,36 @@ void ins_init_branch(void)
 	ins_add("csel X1,X2,X3,lt","1 0 0 1 1 0 1 0 1 0 0 R3 1 0 1 1 0 0 R2 R1",0,0);
 	ins_add("csel X1,X2,X3,gt","1 0 0 1 1 0 1 0 1 0 0 R3 1 1 0 0 0 0 R2 R1",0,0);
 	ins_add("csel X1,X2,X3,le","1 0 0 1 1 0 1 0 1 0 0 R3 1 1 0 1 0 0 R2 R1",0,0);
+
+	ins_add("fcsel F1,F2,F3,eq","0 0 0 1 1 1 1 0 0 1 1 R3 0 0 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,ne","0 0 0 1 1 1 1 0 0 1 1 R3 0 0 0 1 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,cs","0 0 0 1 1 1 1 0 0 1 1 R3 0 0 1 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,cc","0 0 0 1 1 1 1 0 0 1 1 R3 0 0 1 1 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,mi","0 0 0 1 1 1 1 0 0 1 1 R3 0 1 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,pl","0 0 0 1 1 1 1 0 0 1 1 R3 0 1 0 1 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,vs","0 0 0 1 1 1 1 0 0 1 1 R3 0 1 1 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,vc","0 0 0 1 1 1 1 0 0 1 1 R3 0 1 1 1 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,hi","0 0 0 1 1 1 1 0 0 1 1 R3 1 0 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,ls","0 0 0 1 1 1 1 0 0 1 1 R3 1 0 0 1 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,ge","0 0 0 1 1 1 1 0 0 1 1 R3 1 0 1 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,lt","0 0 0 1 1 1 1 0 0 1 1 R3 1 0 1 1 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,gt","0 0 0 1 1 1 1 0 0 1 1 R3 1 1 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel F1,F2,F3,le","0 0 0 1 1 1 1 0 0 1 1 R3 1 1 0 1 1 1 R2 R1",0,0);
+
+	ins_add("fcsel H1,H2,H3,eq","0 0 0 1 1 1 1 0 0 0 1 R3 0 0 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,ne","0 0 0 1 1 1 1 0 0 0 1 R3 0 0 0 1 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,cs","0 0 0 1 1 1 1 0 0 0 1 R3 0 0 1 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,cc","0 0 0 1 1 1 1 0 0 0 1 R3 0 0 1 1 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,mi","0 0 0 1 1 1 1 0 0 0 1 R3 0 1 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,pl","0 0 0 1 1 1 1 0 0 0 1 R3 0 1 0 1 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,vs","0 0 0 1 1 1 1 0 0 0 1 R3 0 1 1 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,vc","0 0 0 1 1 1 1 0 0 0 1 R3 0 1 1 1 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,hi","0 0 0 1 1 1 1 0 0 0 1 R3 1 0 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,ls","0 0 0 1 1 1 1 0 0 0 1 R3 1 0 0 1 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,ge","0 0 0 1 1 1 1 0 0 0 1 R3 1 0 1 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,lt","0 0 0 1 1 1 1 0 0 0 1 R3 1 0 1 1 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,gt","0 0 0 1 1 1 1 0 0 0 1 R3 1 1 0 0 1 1 R2 R1",0,0);
+	ins_add("fcsel H1,H2,H3,le","0 0 0 1 1 1 1 0 0 0 1 R3 1 1 0 1 1 1 R2 R1",0,0);
+
 	ins_add("ret","1 1 0 1 0 1 1 0 0 1 0 1 1 1 1 1 0 0 0 0 0 0 1 1 1 1 0 0 0 0 0 0",0,0);
 }

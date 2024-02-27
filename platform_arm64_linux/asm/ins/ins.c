@@ -138,6 +138,15 @@ int write_default_ins(char *encoding,struct ins_args *args)
 			}
 			ins=ins<<9|args->imm&0x1ff;
 		}
+		else if(!strcmp(word,"Is7m4"))
+		{
+			if(args->imm&3||args->imm<0xffffffffffffff00&&args->imm>0xff)
+			{
+				free(word);
+				return 1;
+			}
+			ins=ins<<7|args->imm>>2&0x7f;
+		}
 		else if(!strcmp(word,"Is7m8"))
 		{
 			if(args->imm&7||args->imm<0xfffffffffffffe00&&args->imm>0x1ff)
