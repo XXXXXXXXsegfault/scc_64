@@ -500,7 +500,7 @@ void out_ins(char *ins1,char *ins2,char *ins3,struct operand *op1,struct operand
 			class=op1->tab->class;
 		}
 	}
-	if(op_is_reg(op1)&&op1->tab->class!=9&&op2->tab->class!=9)
+	if(op_is_reg(op1)&&op1->tab->class!=9&&op2->tab->class!=9&&op1->tab->class!=10&&op2->tab->class!=10)
 	{
 		reg_extend(class,op1->tab->class,op1);
 	}

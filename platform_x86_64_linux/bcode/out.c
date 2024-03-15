@@ -406,11 +406,11 @@ void acd_extend(int reg,int newclass,int oldclass)
 			outs(",%xmm0");
 			if(newclass==9)
 			{
-				outs("movd %xmm0,");
+				outs("\nmovd %xmm0,");
 			}
 			else
 			{
-				outs("movq %xmm0,");
+				outs("\nmovq %xmm0,");
 			}
 			out_acd(newclass,reg);
 			outs("\n");

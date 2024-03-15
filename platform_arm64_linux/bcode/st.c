@@ -54,6 +54,12 @@ void gen_st(struct ins *ins,int c)
 	{
 		if(class2!=2&&class2!=3&&(op2.tab->class>>1<c>>1||op2.tab->class==9||op2.tab->class==10))
 		{
+			if(c==9||c==10||op2.tab->class==9||op2.tab->class==10)
+			{
+				outs("mov x1,");
+				out_reg64(op2_pos);
+				op2_pos=1;
+			}
 			reg_ext(op2_pos,op2.tab->class,c);
 		}
 		op_reg_st(op1.tab->reg+4,op2_pos,c);
@@ -76,6 +82,12 @@ void gen_st(struct ins *ins,int c)
 		}
 		if(class2!=2&&class2!=3&&(op2.tab->class>>1<c>>1||op2.tab->class==9||op2.tab->class==10))
 		{
+			if(c==9||c==10||op2.tab->class==9||op2.tab->class==10)
+			{
+				outs("mov x1,");
+				out_reg64(op2_pos);
+				op2_pos=1;
+			}
 			reg_ext(op2_pos,op2.tab->class,c);
 		}
 		op_reg_st(0,op2_pos,c);
@@ -143,6 +155,12 @@ void gen_sto(struct ins *ins,int c)
 	{
 		if(class2!=2&&class2!=3&&(op2.tab->class>>1<c>>1||op2.tab->class==9||op2.tab->class==10))
 		{
+			if(c==9||c==10||op2.tab->class==9||op2.tab->class==10)
+			{
+				outs("mov x1,");
+				out_reg64(op2_pos);
+				op2_pos=1;
+			}
 			reg_ext(op2_pos,op2.tab->class,c);
 		}
 		op_reg_st_off(op1.tab->reg+4,op2_pos,c,&op3);
@@ -165,6 +183,12 @@ void gen_sto(struct ins *ins,int c)
 		}
 		if(class2!=2&&class2!=3&&(op2.tab->class>>1<c>>1||op2.tab->class==9||op2.tab->class==10))
 		{
+			if(c==9||c==10||op2.tab->class==9||op2.tab->class==10)
+			{
+				outs("mov x1,");
+				out_reg64(op2_pos);
+				op2_pos=1;
+			}
 			reg_ext(op2_pos,op2.tab->class,c);
 		}
 		op_reg_st_off(0,op2_pos,c,&op3);

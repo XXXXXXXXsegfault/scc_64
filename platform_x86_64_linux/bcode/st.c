@@ -35,7 +35,18 @@ void gen_st(struct ins *ins,int c)
 	}
 	if(class2==1)
 	{
-		reg_extend(c,op2.tab->class,&op2);
+		if(op2.tab->class==9||op2.tab->class==10||c==9||c==10)
+		{
+			op2_pos=1;
+			outs("mov ");
+			op_out_reg(8,&op2);
+			outs(",%rax\n");
+			acd_extend(0,c,op2.tab->class);
+		}
+		else
+		{
+			reg_extend(c,op2.tab->class,&op2);
+		}
 	}
 	else if(class2==2)
 	{
@@ -179,7 +190,18 @@ void gen_sto(struct ins *ins,int c)
 	}
 	if(class2==1)
 	{
-		reg_extend(c,op2.tab->class,&op2);
+		if(op2.tab->class==9||op2.tab->class==10||c==9||c==10)
+		{
+			op2_pos=1;
+			outs("mov ");
+			op_out_reg(8,&op2);
+			outs(",%rax\n");
+			acd_extend(0,c,op2.tab->class);
+		}
+		else
+		{
+			reg_extend(c,op2.tab->class,&op2);
+		}
 	}
 	else if(class2==2)
 	{

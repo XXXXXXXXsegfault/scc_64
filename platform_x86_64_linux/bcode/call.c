@@ -198,10 +198,10 @@ void gen_retval(struct ins *ins,int c)
 	}
 	if(class1==1)
 	{
-		reg_extend(c,op1.tab->class,&op1);
 		outs("mov ");
 		op_out_reg(7,&op1);
 		outs(",%rax\n");
+		acd_extend(0,c,op1.tab->class);
 	}
 	else
 	{
