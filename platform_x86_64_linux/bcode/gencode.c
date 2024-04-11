@@ -582,14 +582,22 @@ char *fun_name;
 #include "not.c"
 #include "neg.c"
 #include "adr.c"
+struct msg_list
+{
+	char *name;
+	char *str;
+	struct msg_list *next;
+} *msg_list;
 void write_msg(void)
 {
 	struct ins *ins;
 	int x;
 	long int num;
 	char *name;
+	struct msg_list *node,*end;
 	num=1;
 	ins=ins_head;
+	end=0;
 	while(ins)
 	{
 		x=1;
@@ -600,19 +608,39 @@ void write_msg(void)
 				//TODO CHANGE
 				name=xstrdup("_$MSG");
 				name=str_i_app(name,num);
-				outs("@");
-				outs(name);
-				outs("\n");
-				outs(".string ");
-				outs(ins->args[x]);
-				outs("\n");
-				free(ins->args[x]);
+				node=malloc(sizeof(*node));
+				node->name=xstrdup(name);
+				node->str=ins->args[x];
+				node->next=0;
+				if(end)
+				{
+					end->next=node;
+				}
+				else
+				{
+					msg_list=node;
+				}
+				end=node;
 				ins->args[x]=name;
 				++num;
 			}
 			++x;
 		}
 		ins=ins->next;
+	}
+}
+void write_msg2(void)
+{
+	struct msg_list *node;
+	node=msg_list;
+	while(node)
+	{
+		outs(".align 2\n@");
+		outs(node->name);
+		outs("\n.string ");
+		outs(node->str);
+		outs("\n");
+		node=node->next;
 	}
 }
 void gen_code(struct ins *ins)

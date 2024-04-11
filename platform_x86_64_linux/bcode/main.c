@@ -149,6 +149,7 @@ void bcode_run(void)
 		node=node->next;
 	}
 
+	write_msg2();
 	outs(".datasize ");
 	out_num64(data_size);
 	outs("\n");

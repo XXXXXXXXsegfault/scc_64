@@ -258,7 +258,7 @@ void _mkpe(void)
 	}
 	if(size_imports)
 	{
-		strcpy(pe_header.sections[x].name,".rdata");
+		strcpy(pe_header.sections[x].name,".idata");
 		pe_header.sections[x].vsize=size_align(size_imports);
 		pe_header.sections[x].vaddr=data_addr-PE_BASE+size_align(data_size);
 		pe_header.sections[x].dsize=size_align2(size_imports);

@@ -148,6 +148,7 @@ void bcode_run(void)
 		gen_code(node);
 		node=node->next;
 	}
+	write_msg2();
 
 	outs(".datasize ");
 	out_num64(data_size);
