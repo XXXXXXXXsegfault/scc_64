@@ -62,7 +62,7 @@ void parse_pseudo_op(char *str)
 			{
 				l->import_dll=dllname;
 				l->import_fun=funname;
-				swrite("\xb8\x00\x00\x00\x00\xff\x10",7);
+				swrite("\xff\x15\x00\x00\x00\x00",6);
 			}
 			else
 			{

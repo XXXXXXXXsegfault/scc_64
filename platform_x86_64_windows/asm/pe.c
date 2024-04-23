@@ -228,7 +228,7 @@ void _mkpe(void)
 	{
 		pe_header.subsystem=3;
 	}
-	pe_header.stack_reserve=PE_BASE;
+	pe_header.stack_reserve=0x400000;
 	pe_header.stack_commit=0x1000;
 	pe_header.heap_reserve=0x100000;
 	pe_header.heap_commit=0x1000;
