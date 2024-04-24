@@ -162,6 +162,7 @@ void gen_sto(struct ins *ins,int c)
 				outs("mov x1,");
 				out_reg64(op2_pos);
 				op2_pos=1;
+				outs("\n");
 			}
 			reg_ext(op2_pos,op2.tab->class,c);
 		}
@@ -190,6 +191,7 @@ void gen_sto(struct ins *ins,int c)
 				outs("mov x1,");
 				out_reg64(op2_pos);
 				op2_pos=1;
+				outs("\n");
 			}
 			reg_ext(op2_pos,op2.tab->class,c);
 		}
