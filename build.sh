@@ -6,14 +6,6 @@ then
 fi
 PROG_SUFFIX=
 SUFFIX=
-if [ "$1" == "x86_64_windows" ]
-then
-	PROG_SUFFIX=.exe
-fi
-if [ "$2" == "x86_64_windows" ]
-then
-	SUFFIX=.exe
-fi
 if [ "$2" != "$3" ]
 then
 	RELEASE=release_$2_cross_$3

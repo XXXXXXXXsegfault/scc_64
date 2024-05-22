@@ -1,6 +1,6 @@
 Building
 
-SCC can be built and run on x86_64_linux, arm64_linux, and x86_64_windows.
+SCC can be built and run on x86_64_linux and arm64_linux.
 
 To build SCC, run "./build.sh <build_platform> <host_platform> <target_platform>".
 The generated compilers will be in the "release_*" directory.

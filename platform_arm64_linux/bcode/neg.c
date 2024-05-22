@@ -160,7 +160,7 @@ void gen_neg(struct ins *ins)
 			outs(",");
 			out_reg64(op2.tab->reg+4);
 			outs("\n");
-			outs("add x0,x0,#1");
+			outs("add x0,x0,#1\n");
 			op_mem_ldst("str",&op1,0);
 		}
 		else
@@ -182,7 +182,7 @@ void gen_neg(struct ins *ins)
 				op_calculate_addr(&op2,1);
 			}
 			outs("mvn x1,x1\n");
-			outs("add x1,x1,#1");
+			outs("add x1,x1,#1\n");
 			op_mem_ldst("str",&op1,1);
 		}
 	}

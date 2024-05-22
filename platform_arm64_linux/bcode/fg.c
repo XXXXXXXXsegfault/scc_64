@@ -90,6 +90,18 @@ void id_tab_add(struct id_tab **tab,char *name,long int num,long int class,long 
 	node->reg=-1;
 	node->unused=unused;
 	node->next=tab[hash];
+	if(tab==local_id)
+	{
+		node->storage=0;
+	}
+	else if(tab==args_id)
+	{
+		node->storage=1;
+	}
+	else if(tab==global_id)
+	{
+		node->storage=2;
+	}
 	tab[hash]=node;
 }
 struct id_tab *id_tab_find(struct id_tab **tab,char *name)
@@ -1204,7 +1216,7 @@ void reg_init(void)
 					fstart->stack_size-=32;
 					if(x>=REGS)
 					{
-						fstart->stack_size-=(x-REGS-1)*16;
+						fstart->stack_size-=(x-REGS+1)*16;
 					}
 					fstart->stack_size&=0xfffffffffffffff0;
 				}
@@ -1341,17 +1353,14 @@ struct id_tab *id_find(char *name)
 	struct id_tab *ret;
 	if(ret=id_tab_find(local_id,name))
 	{
-		ret->storage=0;
 		return ret;
 	}
 	if(ret=id_tab_find(args_id,name))
 	{
-		ret->storage=1;
 		return ret;
 	}
 	if(ret=id_tab_find(global_id,name))
 	{
-		ret->storage=2;
 		return ret;
 	}
 	return 0;

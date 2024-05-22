@@ -48,7 +48,7 @@ int op_is_reg(struct operand *op)
 	{
 		return 0;
 	}
-	if(op->tab->reg>=0&&op->tab->reg<REGS)
+	if(op->tab->reg>=0&&op->tab->reg<REGS&&op->tab->storage!=3)
 	{
 		return 1;
 	}
@@ -343,6 +343,36 @@ void op_mem_ldst(char *ld_st,struct operand *op,int reg)
 		out_reg_size(reg,op->tab->class,ld);
 		outs(",[x29,x3]\n");
 	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off;
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			out_reg_size(reg,op->tab->class,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,op->tab->class,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",x3]\n");
+		}
+	}
 }
 void op_mem_ldst_off(char *ld_st,struct operand *op,int reg,struct operand *off)
 {
@@ -402,6 +432,36 @@ void op_mem_ldst_off(char *ld_st,struct operand *op,int reg,struct operand *off)
 		out_reg_size(reg,op->tab->class,ld);
 		outs(",[x29,x3]\n");
 	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off+off->value;
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			out_reg_size(reg,op->tab->class,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,op->tab->class,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",x3]\n");
+		}
+	}
 }
 void op_mem_ldst2(char *ld_st,struct operand *op,int reg,int c)
 {
@@ -459,6 +519,36 @@ void op_mem_ldst2(char *ld_st,struct operand *op,int reg,int c)
 		outs(ld_st);
 		out_reg_size(reg,c,ld);
 		outs(",[x29,x3]\n");
+	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off;
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",x3]\n");
+		}
 	}
 }
 void op_mem_ldst_off2(char *ld_st,struct operand *op,int reg,struct operand *off,int c)
@@ -519,6 +609,137 @@ void op_mem_ldst_off2(char *ld_st,struct operand *op,int reg,struct operand *off
 		out_reg_size(reg,c,ld);
 		outs(",[x29,x3]\n");
 	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off+off->value;
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			out_reg_size(reg,c,ld);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",x3]\n");
+		}
+	}
+}
+void op_mem_ldst_float(char *ld_st,struct operand *op,int reg,int c)
+{
+	long int x;
+	char *reg_name;
+	if(c==9)
+	{
+		reg_name="s";
+	}
+	else
+	{
+		reg_name="d";
+	}
+	if(op->tab->storage==0)
+	{
+		if(op->tab->reg>=REGS)
+		{
+			x=op->tab->reg-REGS;
+			x=x*16+fun_stack_size;
+		}
+		else
+		{
+			x=op->tab->off;
+		}
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			outs(reg_name);
+			out_num64(reg);
+			outs(",[x29,#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			outs(reg_name);
+			out_num64(reg);
+			outs(",[x29,x3]\n");
+		}
+	}
+	else if(op->tab->storage==2)
+	{
+		outs("mov64 x3,@_$DATA+");
+		out_num64(op->tab->off);
+		outs("\n");
+		outs(ld_st);
+		outs(reg_name);
+		out_num64(reg);
+		outs(",[x3]\n");
+	}
+	else if(op->tab->storage==1)
+	{
+		outs("mov64 x3,");
+		out_num64(op->tab->off*16+16);
+		outs("\n");
+		outs(ld_st);
+		outs(reg_name);
+		out_num64(reg);
+		outs(",[x29,x3]\n");
+	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off;
+		if(x<256&&x>-256)
+		{
+			outs(ld_st);
+			outs(reg_name);
+			out_num64(reg);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			if(x<0)
+			{
+				outs("-");
+				x=-x;
+			}
+			out_num64(x);
+			outs("]\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs(ld_st);
+			outs(reg_name);
+			out_num64(reg);
+			outs(",[");
+			out_reg64(op->tab->reg+4);
+			outs(",x3]\n");
+		}
+	}
 }
 void op_calculate_addr(struct operand *op,int reg)
 {
@@ -576,6 +797,41 @@ void op_calculate_addr(struct operand *op,int reg)
 		outs("add ");
 		out_reg64(reg);
 		outs(",x29,x3\n");
+	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off;
+		if(x<256&&x>=0)
+		{
+			outs("add ");
+			out_reg64(reg);
+			outs(",");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			out_num64(x);
+			outs("\n");
+		}
+		else if(x>-256&&x<0)
+		{
+			outs("sub ");
+			out_reg64(reg);
+			outs(",");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			out_num64(-x);
+			outs("\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs("add ");
+			out_reg64(reg);
+			outs(",");
+			out_reg64(op->tab->reg+4);
+			outs(",x3\n");
+		}
 	}
 }
 void op_calculate_addr_off(struct operand *op,int reg,struct operand *off)
@@ -635,6 +891,41 @@ void op_calculate_addr_off(struct operand *op,int reg,struct operand *off)
 		outs("add ");
 		out_reg64(reg);
 		outs(",x29,x3\n");
+	}
+	else if(op->tab->storage==3)
+	{
+		x=op->tab->off+off->value;
+		if(x<256&&x>=0)
+		{
+			outs("add ");
+			out_reg64(reg);
+			outs(",");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			out_num64(x);
+			outs("\n");
+		}
+		else if(x>-256&&x<0)
+		{
+			outs("sub ");
+			out_reg64(reg);
+			outs(",");
+			out_reg64(op->tab->reg+4);
+			outs(",#");
+			out_num64(-x);
+			outs("\n");
+		}
+		else
+		{
+			outs("mov64 x3,");
+			out_num64(x);
+			outs("\n");
+			outs("add ");
+			out_reg64(reg);
+			outs(",");
+			out_reg64(op->tab->reg+4);
+			outs(",x3\n");
+		}
 	}
 }
 void reg_f2q(int reg)
@@ -971,12 +1262,37 @@ void write_msg2(void)
 		node=node->next;
 	}
 }
+int get_next_reg(unsigned long int bm,int off)
+{
+	while(off<REGS)
+	{
+		if(bm&1<<off)
+		{
+			return off;
+		}
+		++off;
+	}
+	return -1;
+}
+int get_prev_reg(unsigned long int bm,int off)
+{
+	while(off>0)
+	{
+		--off;
+		if(bm&1<<off)
+		{
+			return off;
+		}
+	}
+	return -1;
+}
 void gen_code(struct ins *ins)
 {
 	unsigned long int size;
 	int x,x2;
 	int in_asm;
 	unsigned long val;
+	int count_used_regs;
 	if(ins->count_args)
 	{
 		if(!strcmp(ins->args[0],"mov"))
@@ -1245,36 +1561,93 @@ void gen_code(struct ins *ins)
 					outs("sub sp,sp,x1\n");
 				}
 			}
+			count_used_regs=0;
 			x=0;
 			while(x<REGS)
 			{
 				if(ins->used_regs&1<<x)
 				{
-					outs("str ");
-					out_reg64(x+4);
-					outs(",[sp,#-16]!\n");
-					if(ins->arg_map[x]!=-1)
-					{
-						val=ins->arg_map[x]*16+16;
-						if(val<256)
-						{
-							outs("ldr ");
-							out_reg64(x+4);
-							outs(",[x29,#");
-							out_num64(val);
-							outs("]\n");
-						}
-						else
-						{
-							outs("mov64 x1,");
-							out_num64(val);
-							outs("\nldr ");
-							out_reg64(x+4);
-							outs(",[x29,x1]\n");
-						}
-					}
+					++count_used_regs;
 				}
 				++x;
+			}
+			x=get_next_reg(ins->used_regs,0);
+			if(count_used_regs&1)
+			{
+				outs("str ");
+				out_reg64(x+4);
+				outs(",[sp,#-16]!\n");
+				if(ins->arg_map[x]!=-1)
+				{
+					val=ins->arg_map[x]*16+16;
+					if(val<256)
+					{
+						outs("ldr ");
+						out_reg64(x+4);
+						outs(",[x29,#");
+						out_num64(val);
+						outs("]\n");
+					}
+					else
+					{
+						outs("mov64 x1,");
+						out_num64(val);
+						outs("\nldr ");
+						out_reg64(x+4);
+						outs(",[x29,x1]\n");
+					}
+				}
+				x=get_next_reg(ins->used_regs,x+1);
+			}
+			while(x!=-1)
+			{
+				x2=get_next_reg(ins->used_regs,x+1);
+				outs("stp ");
+				out_reg64(x2+4);
+				outs(",");
+				out_reg64(x+4);
+				outs(",[sp,#-16]!\n");
+				if(ins->arg_map[x]!=-1)
+				{
+					val=ins->arg_map[x]*16+16;
+					if(val<256)
+					{
+						outs("ldr ");
+						out_reg64(x+4);
+						outs(",[x29,#");
+						out_num64(val);
+						outs("]\n");
+					}
+					else
+					{
+						outs("mov64 x1,");
+						out_num64(val);
+						outs("\nldr ");
+						out_reg64(x+4);
+						outs(",[x29,x1]\n");
+					}
+				}
+				if(ins->arg_map[x2]!=-1)
+				{
+					val=ins->arg_map[x2]*16+16;
+					if(val<256)
+					{
+						outs("ldr ");
+						out_reg64(x2+4);
+						outs(",[x29,#");
+						out_num64(val);
+						outs("]\n");
+					}
+					else
+					{
+						outs("mov64 x1,");
+						out_num64(val);
+						outs("\nldr ");
+						out_reg64(x2+4);
+						outs(",[x29,x1]\n");
+					}
+				}
+				x=get_next_reg(ins->used_regs,x2+1);
 			}
 			last_store_valid=0;
 		}
@@ -1285,16 +1658,34 @@ void gen_code(struct ins *ins)
 				outs("@");
 				out_label_name(fun_name);
 				outs("$END\n");
-				x=REGS;
-				while(x)
+				x=0;
+				while(x<REGS)
 				{
-					--x;
 					if(fstart->used_regs&1<<x)
+					{
+						++count_used_regs;
+					}
+					++x;
+				}
+				x=get_prev_reg(fstart->used_regs,REGS);
+				while(x!=-1)
+				{
+					x2=get_prev_reg(fstart->used_regs,x);
+					if(x2==-1)
 					{
 						outs("ldr ");
 						out_reg64(x+4);
 						outs(",[sp],#16\n");
 					}
+					else
+					{
+						outs("ldp ");
+						out_reg64(x+4);
+						outs(",");
+						out_reg64(x2+4);
+						outs(",[sp],#16\n");
+					}
+					x=get_prev_reg(fstart->used_regs,x2);
 				}
 				outs("mov sp,x29\nldp x29,x30,[sp],#16\nret\n");
 				fstart=0;

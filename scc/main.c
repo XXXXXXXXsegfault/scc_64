@@ -58,35 +58,3 @@ Defined:
 	}
 	out_flush();
 }
-/*
-int main(int argc,char **argv)
-{
-	struct syntax_tree *root;
-	if(argc<3)
-	{
-		return 1;
-	}
-	fdi=open(argv[1],0,0);
-	if(fdi<0)
-	{
-		return 1;
-	}
-	fdo=open(argv[2],578,0644);
-	if(fdo<0)
-	{
-		return 1;
-	}
-	l_global_init();
-	expr_global_init();
-	type_global_init();
-	parse_global_init();
-	load_file();
-	p_current_word=l_words_head;
-	root=parse_file();
-	translate_file(root);
-	out_flush();
-	close(fdi);
-	close(fdo);
-	return 0;
-}
-*/
